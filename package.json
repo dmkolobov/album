@@ -1,5 +1,9 @@
 {
-  "name": "hello-world",
-  "version": "0.1.0",
-  "main": "resources/main.js"
+  "name":         "hello-world",
+  "version":      "0.1.0",
+  "main":         "resources/main.js",
+  "dependencies": {
+    "ncp": "2.0.0",
+    "gm":  "1.23.0"
+  }
 }
