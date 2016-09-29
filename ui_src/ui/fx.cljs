@@ -1,5 +1,6 @@
 (ns ui.fx
-  (:require [re-frame.core :refer [reg-fx reg-event-fx trim-v reg-event-db dispatch]]))
+  (:require [re-frame.core :refer [reg-fx reg-event-fx trim-v reg-event-db dispatch]]
+            [cljs.pprint :refer [pprint]]))
 
 (defonce gm (js/require "gm"))
 
@@ -15,19 +16,23 @@
 ;; ---------------------------------------------------------------------------------
 
 (reg-fx
-  :gm/get
-  (fn [{:keys [path on-success on-error]}]
-    (.identify (gm path) (mk-node-handler on-success on-error))))
+  :gm/read-info
+  (fn [{:keys [in on-success on-error]}]
+    (.identify (gm in)
+               (fn [err val]
+                 (if err
+                   (dispatch (conj on-error (js->clj err)))
+                   (dispatch (conj on-success {:size (js->clj val.size :keywordize-keys true)})))))))
 
 (reg-fx
   :gm/manipulate
-  (fn [{:keys [path out-path commands on-success on-error]}]
-    (let [gm      (gm path)]
+  (fn [{:keys [in out commands on-success on-error]}]
+    (let [gm      (gm in)]
       (doseq [[action & args] commands]
         (condp = action
           :resize  (let [[w h] args] (.resize gm w h))
           :quality (let [[factor] args] (.quality gm factor))))
-      (.write gm out-path (mk-node-handler on-success on-error)))))
+      (.write gm out (mk-node-handler on-success on-error)))))
 
 ;; ---- File system effects
 ;; ----------------------------
@@ -36,12 +41,24 @@
 (defonce fs (js/require "fs"))
 (defonce ncp (js/require "ncp"))
 
+(defn process-stats
+  [stats]
+  {:filesize      stats.size
+   :last-modified stats.mtime})
+
 (reg-fx
-  :fs
-  (fn [{:keys [command args on-success on-error]}]
+  :fs/stat
+  (fn [{:keys [in on-success on-error]}]
+    (println "gathering stats")
+    (.stat fs
+           in
+           (fn [err val]
+             (if err
+               (dispatch (conj on-error (js->clj err)))
+               (dispatch (conj on-success (process-stats val))))))))
+
+(reg-fx
+  :fs/copy
+  (fn [{:keys [in out on-success on-error]}]
     (let [handler (mk-node-handler on-success on-error)]
-      (condp = command
-        :copy       (let [[in out] args] (ncp in out handler))
-        :read-dir   (let [[path] args] (.readdir fs path handler))
-        :read-file  (let [[path] args] (.readFile fs path handler))
-        :write-file (let [[path content] args] (.writeFile fs path content handler))))))
+      (ncp in out handler))))

@@ -6,6 +6,7 @@
                  [figwheel "0.5.2"]
                  [reagent "0.6.0-rc"]
                  [re-frame "0.8.0"]
+                 [re-com "0.9.0"]
                  [album-layout "0.1.2"]
                  [ring/ring-core "1.4.0"]
                  [day8.re-frame/async-flow-fx "0.0.7-DEV"]]
