@@ -43,8 +43,8 @@
 
 (defn process-stats
   [stats]
-  {:filesize      stats.size
-   :last-modified stats.mtime})
+  {:filesize      (.-size stats)
+   :last-modified (.-mtime stats)})
 
 (reg-fx
   :fs/stat

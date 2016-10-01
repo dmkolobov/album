@@ -1,6 +1,6 @@
 (ns ui.images.events
   (:require [re-frame.core :refer [reg-event-fx reg-event-db trim-v]]
-            [ui.async :refer [async-action]]
+            [ui.async :refer [async-action] :as async]
             [ui.fx]))
 
 (defrecord ImageAsset [filesize last-modified size])
@@ -11,6 +11,7 @@
   :image/update-info
   [trim-v]
   (fn [db [path info]]
+    (println "update info:" info db)
     (update-in db
                [:image-info path]
                (fn [image]
@@ -22,18 +23,12 @@
   :image/read-info
   image-intercept
   (fn [{:keys [on-success on-error]} [path]]
-    (let [write-state [:image/update-info path]
-
-          fs-event    [:async/fx
-                       :fs/stat {:in path :on-success write-state}]
-
-          gm-event    [:async/fx
-                       :gm/read-info {:in        path
-                                       :attrs      [:size]
-                                       :on-success write-state}]]
-      {:async/all {:events     [gm-event fs-event]
-                   :on-success on-success
-                   :on-error   on-error}})))
+    (let [write-db [:image/update-info path]
+          fs-event [:async/fx :fs/stat {:in path :on-success write-db}]
+          gm-event [:async/fx :gm/read-info {:in path :on-success write-db}]]
+      (async/all-events {:events     [gm-event fs-event]
+                         :on-success on-success
+                         :on-error   on-error}))))
 
 (reg-event-fx
   :image/import
@@ -41,18 +36,18 @@
   (fn [{:keys [on-success on-error]} [in out]]
     (let [copy-event [:async/fx :fs/copy {:in in :out out}]
           read-event [:image/read-info out]]
-      {:async/sequence {:events     [copy-event read-event]
-                        :on-success on-success
-                        :on-error   on-error}})))
+      (async/sequence-events {:events     [copy-event read-event]
+                              :on-success on-success
+                              :on-error   on-error}))))
 
 (reg-event-fx
   :image/resize
   image-intercept
   (fn [{:keys [on-success on-error]} [in out width]]
-    {:async/sequence {:events     [[:async/fx
-                                     :gm/manipulate {:in       in
-                                                     :out      out
-                                                     :commands [[:resize width]]}]
-                                  [:image/read-info out]]
-                      :on-success on-success
-                      :on-error   on-error}}))
+    (async/sequence-events {:events     [[:async/fx
+                                           :gm/manipulate {:in       in
+                                                           :out      out
+                                                           :commands [[:resize width]]}]
+                                        [:image/read-info out]]
+                            :on-success on-success
+                            :on-error   on-error})))
