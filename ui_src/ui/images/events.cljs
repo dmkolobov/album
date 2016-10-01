@@ -10,22 +10,20 @@
 (reg-event-db
   :image/update-info
   [trim-v]
-  (fn [db [path info]]
-    (println "update info:" info db)
+  (fn [db [path attr info]]
     (update-in db
                [:image-info path]
                (fn [image]
                  (if image
-                   (merge image info)
-                   (map->ImageAsset info))))))
+                   (merge image (if info {attr info} attr))
+                   (map->ImageAsset (if info {attr info} attr)))))))
 
 (reg-event-fx
   :image/read-info
   image-intercept
   (fn [{:keys [on-success on-error]} [path]]
-    (let [write-db [:image/update-info path]
-          fs-event [:async/fx :fs/stat {:in path :on-success write-db}]
-          gm-event [:async/fx :gm/read-info {:in path :on-success write-db}]]
+    (let [fs-event [:async/fx :fs/stat {:in path :on-success [:image/update-info path]}]
+          gm-event [:async/fx :gm/read-info {:in path :on-success [:image/update-info path :size]}]]
       (async/all-events {:events     [gm-event fs-event]
                          :on-success on-success
                          :on-error   on-error}))))

@@ -18,8 +18,8 @@
 
 (reg-event-fx :async/do-fx [trim-v] (fn [_ [fx]] fx))
 
-(reg-event-db :async/success (fn [db v] (println "success:" v) db))
-(reg-event-db :async/error (fn [db v] (println "error:" v) db))
+(reg-event-db :async/success (fn [db v] db))
+(reg-event-db :async/error (fn [db v] db))
 
 ;; ---- composing events
 ;; -------------------------
@@ -79,10 +79,6 @@
                                      {:when     :seen-any-of?
                                       :events   [on-success on-error]
                                       :halt?    true}]}}]
-        (println "---------- doing async ---------------")
-        (pprint flow)
-        (println "--------------------------------------")
-
         flow)
       {id (assoc args
         :on-success on-success

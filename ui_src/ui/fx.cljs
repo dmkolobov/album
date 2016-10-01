@@ -22,7 +22,7 @@
                (fn [err val]
                  (if err
                    (dispatch (conj on-error (js->clj err)))
-                   (dispatch (conj on-success {:size (js->clj val.size :keywordize-keys true)})))))))
+                   (dispatch (conj on-success (js->clj val.size :keywordize-keys true))))))))
 
 (reg-fx
   :gm/manipulate
