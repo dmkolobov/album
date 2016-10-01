@@ -42,39 +42,19 @@
 
 (reg-event-fx
   :import-images
-  [trim-v]
-  (fn [_ [images]]
+  [async-action trim-v]
+  (fn [{:keys [on-success on-error]} [images]]
     (async/all-events
       {:events (mapv #(vector :image/import % (import-path %))
                                images)
-       :on-success [:println "success import"]
-       :on-error   [:println "error import"]})))
+       :on-success on-success
+       :on-error   on-error})))
 
 (reg-event-fx
   :start-import
   (fn []
     {:file-dialog
      {:on-select [:import-images]}}))
-
-(reg-event-fx
-  :hello
-  [async-action trim-v]
-  (fn [{:keys [on-success]} v] {:dispatch on-success}))
-
-(reg-event-fx
-  :goodbye
-  [async-action trim-v]
-  (fn [{:keys [on-success]} v] {:dispatch on-success}))
-;;
-
-(reg-event-fx
-  :foo
-  [async-action trim-v]
-  (fn []
-    (async/all-events {:events [[:hello "foo"]
-                                [:hello "bar"]]
-                       :on-success [:println "bar"]
-                       :on-error   [:println "wrong"]})))
 
 (defn root-component
   []
@@ -83,7 +63,12 @@
     (fn []
       [:div
        [:a {:href "#" :on-click #(dispatch [:start-import])} "Import"]
-       [:pre (with-out-str (pprint @info))]])))
+       (doall
+         (for [[path info] @info]
+           (do
+             [:div
+              [:img {:src path :style {:max-width "200px"}}]
+              [:pre (str (:size info))]])))])))
 
 (reagent/render
   [root-component]
