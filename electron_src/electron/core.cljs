@@ -26,3 +26,21 @@
 (.on app "window-all-closed" #(when-not (= js/process.platform "darwin")
                                 (.quit app)))
 (.on app "ready" init-browser)
+
+(defn open-files
+  [done]
+  (.showOpenDialog electron.dialog
+                   (clj->js
+                     {"properties" ["openFile" "multiSelections"]
+                      "filters"    [{"name"       "JPEGEEZ"
+                                     "extensions" ["jpg"]}]})
+                   done))
+
+(.on electron.ipcMain
+     "open-files"
+     (fn [event args]
+       (open-files
+         (fn [files]
+           (.send event.sender
+                  "open-files:response"
+                  (clj->js {"id" args.id "files" files}))))))

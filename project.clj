@@ -9,6 +9,7 @@
                  [re-com "0.9.0"]
                  [album-layout "0.1.2"]
                  [ring/ring-core "1.4.0"]
+                 [com.cognitect/transit-cljs "0.8.239"]
                  [day8.re-frame/async-flow-fx "0.0.9-DEV"]]
   :plugins [[lein-cljsbuild "1.1.1"]
             [lein-figwheel "0.5.2"]]

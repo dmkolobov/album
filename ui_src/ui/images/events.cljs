@@ -3,7 +3,10 @@
             [ui.async :refer [async-action] :as async]
             [ui.fx]))
 
-(defrecord ImageAsset [filesize last-modified size])
+(defonce file-path (js/require "path"))
+
+(defrecord ImageAsset
+  [filesize last-modified size])
 
 (def image-intercept [async-action trim-v])
 
@@ -29,6 +32,10 @@
                          :on-error   on-error}))))
 
 (reg-event-fx
+  :image/preload
+  (fn [cofx [path]] {:preload-image path}))
+
+(reg-event-fx
   :image/import
   image-intercept
   (fn [{:keys [on-success on-error]} [in out]]
@@ -37,6 +44,25 @@
       (async/sequence-events {:events     [copy-event read-event]
                               :on-success on-success
                               :on-error   on-error}))))
+
+(defn import-path
+  [path]
+  (.join file-path js/process.env.HOME (.basename file-path path)))
+
+(reg-event-fx
+  :import-images
+  [async-action trim-v]
+  (fn [{:keys [on-success on-error]} [images]]
+    (async/all-events
+      {:events (mapv #(vector :image/import % (import-path %))
+                     images)
+       :on-success on-success
+       :on-error   on-error})))
+
+(reg-event-fx
+  :start-import
+  (constantly
+    {:main-thread/open-files {:on-open [:import-images]}}))
 
 (reg-event-fx
   :image/resize

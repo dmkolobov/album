@@ -11,55 +11,16 @@
             [ui.fx]
             [ui.async :refer [async-action] :as async]
 
+            [cognitect.transit :as transit]
+
             [ui.images.events]
             [ui.images.subs]))
 
 (enable-console-print!)
 
-(defonce file-path (js/require "path"))
-
-(defonce electron (js/require "electron"))
-
-(reg-fx
-  :file-dialog
-  (fn [{:keys [on-select]}]
-    (.showOpenDialog electron.remote.dialog
-                     (clj->js
-                       {"properties" ["openFile" "multiSelections"]
-                        "filters"    [{"name"       "JPEGEEZ"
-                                       "extensions" ["jpg"]}]})
-                     #(dispatch (conj on-select (js->clj %))))))
-
-(reg-event-fx
-  :println
-  (fn [{:keys [db]} [_ message]]
-    (println message)
-    {:db db}))
-
-(defn import-path
-  [path]
-  (.join file-path js/process.env.HOME (.basename file-path path)))
-
-(reg-event-fx
-  :import-images
-  [async-action trim-v]
-  (fn [{:keys [on-success on-error]} [images]]
-    (async/all-events
-      {:events (mapv #(vector :image/import % (import-path %))
-                               images)
-       :on-success on-success
-       :on-error   on-error})))
-
-(reg-event-fx
-  :start-import
-  (fn []
-    {:file-dialog
-     {:on-select [:import-images]}}))
-
 (defn root-component
   []
   (let [info (subscribe [:image-info])]
-    (dispatch [:foo])
     (fn []
       [:div
        [:a {:href "#" :on-click #(dispatch [:start-import])} "Import"]

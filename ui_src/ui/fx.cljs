@@ -1,5 +1,7 @@
 (ns ui.fx
-  (:require [re-frame.core :refer [reg-fx reg-event-fx trim-v reg-event-db dispatch]]
+  (:require [ui.fx.main-thread]
+
+    [re-frame.core :refer [reg-fx reg-event-fx trim-v reg-event-db dispatch]]
             [cljs.pprint :refer [pprint]]))
 
 (defonce gm (js/require "gm"))
@@ -10,6 +12,15 @@
     (if err
       (dispatch (conj on-err (js->clj err)))
       (dispatch (if val (conj on-success (js->clj val)) on-success)))))
+
+;; ---- Images
+
+(reg-fx
+  :preload-image
+  (fn [{:keys [path on-success]}]
+    (let [image (js/Image.)]
+      (.addEventListener image "load" #(dispatch on-success))
+      (aset image "src" path))))
 
 ;; ---- GraphicsMagick effects
 ;; -------------------------------
