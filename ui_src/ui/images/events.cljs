@@ -43,13 +43,22 @@
   :image/import
   image-intercept
   (fn [{:keys [on-success on-error]} [in out]]
-    (let [copy-event [:async/fx :fs/copy {:in in :out out}]
-          read-event [:image/read-info out]
+    (let [copy-event    [:async/fx :fs/copy {:in in :out out}]
+          read-event    [:image/read-info out]
           preload-event [:image/preload out]]
-      (async/sequence-events {:events     [copy-event read-event]
-                              :on-success [:async/do-fx
-                                           {:dispatch-n [on-success preload-event]}]
-                              :on-error   on-error}))))
+      {:async-flow
+       {:first-dispatch copy-event
+
+        :rules [{:when         :seen-sequence?
+                 :events       [copy-event read-event]
+                 :step-success [:async/success]
+                 :dispatch-n   [on-success preload-event]
+                 :halt?        true}
+
+                {:when     :seen-any-of?
+                 :events   [[:async/error copy-event] [:async/error read-event]]
+                 :dispatch on-error
+                 :halt?    true}]}})))
 
 (defn import-path
   [path]
@@ -72,15 +81,3 @@
   :start-import
   (constantly
     {:main-thread/open-files {:on-open [:import-images]}}))
-
-(reg-event-fx
-  :image/resize
-  image-intercept
-  (fn [{:keys [on-success on-error]} [in out width]]
-    (async/sequence-events {:events     [[:async/fx
-                                           :gm/manipulate {:in       in
-                                                           :out      out
-                                                           :commands [[:resize width]]}]
-                                        [:image/read-info out]]
-                            :on-success on-success
-                            :on-error   on-error})))
