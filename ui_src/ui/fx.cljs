@@ -18,8 +18,9 @@
 (reg-fx
   :preload-image
   (fn [{:keys [path on-success]}]
+    (println "preloading" path on-success)
     (let [image (js/Image.)]
-      (.addEventListener image "load" #(dispatch on-success))
+      (.addEventListener image "load" #(do (println "loaded") (dispatch on-success)))
       (aset image "src" path))))
 
 ;; ---- GraphicsMagick effects
@@ -71,5 +72,9 @@
 (reg-fx
   :fs/copy
   (fn [{:keys [in out on-success on-error]}]
-    (let [handler (mk-node-handler on-success on-error)]
-      (ncp in out handler))))
+      (ncp in
+           out
+           (fn [err]
+             (if err
+               (dispatch on-error)
+               (dispatch on-success))))))

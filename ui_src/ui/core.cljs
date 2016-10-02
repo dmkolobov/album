@@ -18,6 +18,25 @@
 
 (enable-console-print!)
 
+;; ---- common events ----
+;; -----------------------
+
+(reg-event-db
+  :write-to
+  [trim-v]
+  (fn [db [path val]] (assoc-in db path val)))
+
+;; ---- views ----
+;; ---------------
+
+(defn image
+  [path]
+  (let [preloaded? (subscribe [:preloaded? path])]
+    (fn [_]
+      (if @preloaded?
+        [:img {:src path :style {:max-width "200px"}}]
+        [:div "loading..."]))))
+
 (defn root-component
   []
   (let [info (subscribe [:image-info])]
@@ -25,11 +44,8 @@
       [:div
        [:a {:href "#" :on-click #(dispatch [:start-import])} "Import"]
        (doall
-         (for [[path info] @info]
-           (do
-             [:div
-              [:img {:src path :style {:max-width "200px"}}]
-              [:pre (str (:size info))]])))])))
+         (for [[path _] @info]
+           ^{:key path} [image path]))])))
 
 (reagent/render
   [root-component]

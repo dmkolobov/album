@@ -33,29 +33,38 @@
 
 (reg-event-fx
   :image/preload
-  (fn [cofx [path]] {:preload-image path}))
+  [trim-v]
+  (fn [_ [path]]
+    {:preload-image
+     {:path       path
+      :on-success [:write-to [:preloaded? path] true]}}))
 
 (reg-event-fx
   :image/import
   image-intercept
   (fn [{:keys [on-success on-error]} [in out]]
     (let [copy-event [:async/fx :fs/copy {:in in :out out}]
-          read-event [:image/read-info out]]
+          read-event [:image/read-info out]
+          preload-event [:image/preload out]]
       (async/sequence-events {:events     [copy-event read-event]
-                              :on-success on-success
+                              :on-success [:async/do-fx
+                                           {:dispatch-n [on-success preload-event]}]
                               :on-error   on-error}))))
 
 (defn import-path
   [path]
   (.join file-path js/process.env.HOME (.basename file-path path)))
 
+(defn path->import-event
+  [path]
+  [:image/import path (import-path path)])
+
 (reg-event-fx
   :import-images
   [async-action trim-v]
   (fn [{:keys [on-success on-error]} [images]]
     (async/all-events
-      {:events (mapv #(vector :image/import % (import-path %))
-                     images)
+      {:events     (mapv path->import-event images)
        :on-success on-success
        :on-error   on-error})))
 
