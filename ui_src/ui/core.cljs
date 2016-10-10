@@ -8,10 +8,9 @@
 
             [cljs.pprint :refer [pprint]]
 
-            [ui.fx]
-            [ui.async :refer [async-action] :as async]
-
-            [cognitect.transit :as transit]
+            [ui.fx.fs]
+            [ui.fx.img]
+            [ui.fx.main-thread]
 
             [ui.images.events]
             [ui.images.subs]))

@@ -1,7 +1,6 @@
 (ns ui.images.events
   (:require [re-frame.core :refer [reg-event-fx reg-event-db trim-v]]
-            [ui.async :refer [async-action] :as async]
-            [ui.fx]))
+            [ui.async-util :refer [async-action]]))
 
 (defonce file-path (js/require "path"))
 
@@ -11,71 +10,108 @@
 (def image-intercept [async-action trim-v])
 
 (reg-event-db
-  :image/update-info
+  :image/store-info
   [trim-v]
-  (fn [db [path attr info]]
+  (fn [db [[_ _ path info]]]
     (update-in db
                [:image-info path]
                (fn [image]
-                 (if image
-                   (merge image (if info {attr info} attr))
-                   (map->ImageAsset (if info {attr info} attr)))))))
+                 (if image (into image info) (map->ImageAsset info))))))
+
+(reg-event-db
+  :image/mark-loaded
+  [trim-v]
+  (fn [db [path]]
+    (assoc-in db [:preloaded? path] true)))
 
 (reg-event-fx
   :image/read-info
   image-intercept
   (fn [{:keys [on-success on-error]} [path]]
-    (let [fs-event [:async/fx :fs/stat {:in path :on-success [:image/update-info path]}]
-          gm-event [:async/fx :gm/read-info {:in path :on-success [:image/update-info path :size]}]]
-      (async/all-events {:events     [gm-event fs-event]
-                         :on-success on-success
-                         :on-error   on-error}))))
+    (let [fs-query [:fs/stat {:path path}]
+          gm-query [:img/info {:path path}]]
+      {:async-flow
+       {:first-dispatches [gm-query fs-query]
+        :rules          [{:when     :seen?
+                          :event    [:async/success fs-query]
+                          :capture? true
+                          :dispatch [:image/store-info]}
 
-(reg-event-fx
-  :image/preload
-  [trim-v]
-  (fn [_ [path]]
-    {:preload-image
-     {:path       path
-      :on-success [:write-to [:preloaded? path] true]}}))
+                         {:when     :seen?
+                          :event    [:async/success gm-query]
+                          :capture? true
+                          :dispatch [:image/store-info]}
+
+                         {:when     :seen?
+                          :events   [[:async/success fs-query]
+                                     [:async/success gm-query]]
+                          :dispatch on-success
+                          :halt?    true}
+
+                         {:when     :seen-any-of?
+                          :events   [[:async/error fs-query]
+                                     [:async/error gm-query]]
+                          :halt?    true
+                          :capture? true
+                          :dispatch on-error}]}})))
 
 (reg-event-fx
   :image/import
   image-intercept
-  (fn [{:keys [on-success on-error]} [in out]]
-    (let [copy-event    [:async/fx :fs/copy {:in in :out out}]
-          read-event    [:image/read-info out]
-          preload-event [:image/preload out]]
+  (fn [{:keys [on-success on-error]} [src-path dest-path]]
+    (let [copy-event    [:fs/copy {:src-path src-path :dest-path dest-path}]
+          read-event    [:image/read-info dest-path]
+          preload-event [:img/preload {:path dest-path}]]
       {:async-flow
        {:first-dispatch copy-event
 
-        :rules [{:when         :seen-sequence?
-                 :events       [copy-event read-event]
-                 :step-success [:async/success]
-                 :dispatch-n   [on-success preload-event]
-                 :halt?        true}
+        :rules [{:when     :seen?
+                 :event    [:async/success copy-event]
+                 :dispatch read-event}
+
+                {:when       :seen?
+                 :event      [:async/success read-event]
+                 :dispatch   preload-event}
+
+                {:when       :seen?
+                 :event      [:async/success preload-event]
+                 :dispatch-n [on-success [:image/mark-loaded dest-path]]
+                 :halt?      true}
 
                 {:when     :seen-any-of?
                  :events   [[:async/error copy-event] [:async/error read-event]]
                  :dispatch on-error
+                 :capture? true
                  :halt?    true}]}})))
-
-(defn import-path
-  [path]
-  (.join file-path js/process.env.HOME (.basename file-path path)))
 
 (defn path->import-event
   [path]
-  [:image/import path (import-path path)])
+  [:image/import path (.join file-path
+                             js/process.env.HOME
+                             (.basename file-path path))])
 
 (reg-event-fx
   :import-images
   [async-action trim-v]
   (fn [{:keys [on-success on-error]} [images]]
-    (async/all-events
-      {:events     (mapv path->import-event images)
-       :on-success on-success
-       :on-error   on-error})))
+    (let [events    (mapv path->import-event images)
+          successes (mapv #(vector :async/success %) events)
+          errors    (mapv #(vector :async/error %) events)]
+      (println "importing" images)
+      {:async-flow
+
+       {:first-dispatches events
+
+        :rules [{:when     :seen?
+                 :events   successes
+                 :dispatch on-success
+                 :halt?    true}
+
+                {:when     :seen?
+                 :events   errors
+                 :dispatch on-error
+                 :halt?    true
+                 :capture? true}]}})))
 
 (reg-event-fx
   :start-import
