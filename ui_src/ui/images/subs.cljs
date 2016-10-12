@@ -2,7 +2,7 @@
   (:require [re-frame.core :refer [reg-sub]]))
 
 (reg-sub
-  :image-info
+  :image-metrics
   (fn [db] (get db :image-info)))
 
 (reg-sub

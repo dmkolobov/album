@@ -2,3 +2,19 @@
   width: 100px;
   margin-left: 5px;
 }
+
+.property-list {
+
+}
+
+.property-list-title {
+  font-weight: bold;
+  font-size: 2em;
+  width: 8em;
+  vertical-align: top;
+}
+
+.property-list-label {
+  font-weight: bold;
+  width: 8rem;
+}

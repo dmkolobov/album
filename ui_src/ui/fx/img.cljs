@@ -11,7 +11,10 @@
                (fn [err val]
                  (if err
                    (dispatch (conj on-error path (js->clj err)))
-                   (dispatch (conj on-success path {:size (js->clj val.size :keywordize-keys true)})))))))
+                   (dispatch (conj on-success
+                                   path
+                                   (let [{:keys [width height] :as size} (js->clj val.size :keywordize-keys true)]
+                                     {:size size :aspect (/ width height)}))))))))
 
 (reg-fx-service
   :img/preload

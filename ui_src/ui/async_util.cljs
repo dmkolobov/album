@@ -14,7 +14,9 @@
                           :on-error   [:async/error event]))))))
 
 (reg-event-db :async/success (fn [db v] (println v) db))
-(reg-event-db :async/error (fn [db v] db))
+(reg-event-db :async/error (fn [db v]
+                             (throw js/Error "myerror")
+                             db))
 
 (defn reg-fx-service
   "Register an fx handler which performs some async action, and should dispatch
