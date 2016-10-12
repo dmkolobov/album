@@ -12,7 +12,7 @@
 (reg-event-db
   :image/store-info
   [trim-v]
-  (fn [db [[_ _ path info]]]
+  (fn [db [path [_ _ _ info]]]
     (update-in db
                [:image-info path]
                (fn [image]
@@ -27,20 +27,21 @@
 (reg-event-fx
   :image/read-info
   image-intercept
-  (fn [{:keys [on-success on-error]} [path]]
+  (fn [{:keys [on-success on-error]} [path final-path]]
     (let [fs-query [:fs/stat {:path path}]
-          gm-query [:img/info {:path path}]]
+          gm-query [:img/info {:path path}]
+          store-qr [:image/store-info (if final-path final-path path)]]
       {:async-flow
        {:first-dispatches [gm-query fs-query]
         :rules          [{:when     :seen?
                           :event    [:async/success fs-query]
                           :capture? true
-                          :dispatch [:image/store-info]}
+                          :dispatch store-qr}
 
                          {:when     :seen?
                           :event    [:async/success gm-query]
                           :capture? true
-                          :dispatch [:image/store-info]}
+                          :dispatch store-qr}
 
                          {:when     :seen?
                           :events   [[:async/success fs-query]
@@ -59,18 +60,18 @@
   :image/import
   image-intercept
   (fn [{:keys [on-success on-error]} [src-path dest-path]]
-    (let [copy-event    [:fs/copy {:src-path src-path :dest-path dest-path}]
-          read-event    [:image/read-info dest-path]
+    (let [read-event    [:image/read-info src-path dest-path]
+          copy-event    [:fs/copy {:src-path src-path :dest-path dest-path}]
           preload-event [:img/preload {:path dest-path}]]
       {:async-flow
-       {:first-dispatch copy-event
+       {:first-dispatch read-event
 
         :rules [{:when     :seen?
-                 :event    [:async/success copy-event]
-                 :dispatch read-event}
+                 :event    [:async/success read-event]
+                 :dispatch copy-event}
 
                 {:when       :seen?
-                 :event      [:async/success read-event]
+                 :event      [:async/success copy-event]
                  :dispatch   preload-event}
 
                 {:when       :seen?

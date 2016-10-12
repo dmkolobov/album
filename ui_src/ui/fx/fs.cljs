@@ -2,8 +2,7 @@
   (:require [re-frame.core :refer [dispatch]]
             [ui.async-util :refer [reg-fx-service]]))
 
-(defonce fs (js/require "fs"))
-(defonce ncp (js/require "ncp"))
+(defonce fs (js/require "fs-extra"))
 
 (reg-fx-service
   :fs/stat
@@ -21,9 +20,10 @@
 (reg-fx-service
   :fs/copy
   (fn [{:keys [src-path dest-path on-success on-error]}]
-    (ncp src-path
-         dest-path
-         (fn [err]
-           (if err
-             (dispatch on-error)
-             (dispatch on-success))))))
+    (.copy fs
+           src-path
+           dest-path
+           (fn [err]
+             (if err
+               (dispatch on-error)
+               (dispatch on-success))))))
