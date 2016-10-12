@@ -45,24 +45,28 @@
                                                       [throbber :size :small])]]]
 
                     [h-box :children [[label :label "Filesize"  :class "property-list-label"]
-                                      [label :label (str filesize " bytes")]]]]])
+                                      [label :label (if filesize
+                                                      (str filesize " bytes")
+                                                      [throbber :size :small])]]]]])
+
+(defn image-display
+  [path _]
+  (let [preloaded? (subscribe [:preloaded? path])]
+    (fn [_ {:keys [width height]}]
+      (if @preloaded?
+        [:img {:src    path
+               :width  width
+               :height height}]
+        [box :width (str width "px") :height (str height "px") :child [throbber]]))))
 
 (defn image
-  [path _]
-  (let [filename   (.basename file-path path)
-        preloaded? (subscribe [:preloaded? path])]
-    (fn [_ {:keys [aspect] :as metrics}]
-      [h-box :class    "property-list"
-             :align    :baseline
-             :gap      "1em"
-             :children [[box :size "400px"
-                             :align-self :start
-                             :child (if @preloaded?
-                                      [:img {:src path
-                                             :width "400px"
-                                             :height (str (/ 400 aspect) "px")}]
-                                      [throbber])]
-                        [image-info filename metrics]]])))
+  [path {:keys [aspect] :as metrics}]
+  (let [filename (.basename file-path path)]
+    [h-box :class    "property-list"
+           :gap      "1em"
+           :children [[box :size "none"
+                           :child [image-display path {:width "400" :height (/ 400 aspect)}]]
+                      [image-info filename metrics]]]))
 
 (defn import-view
   []
