@@ -7,7 +7,7 @@
                  [reagent "0.6.0-rc"]
                  [re-frame "0.8.1"]
                  [re-com "0.9.0"]
-                 [album-layout "0.1.2"]
+                 [album-layout "0.1.3"]
                  [ring/ring-core "1.4.0"]
                  [com.cognitect/transit-cljs "0.8.239"]
                  [day8.re-frame/async-flow-fx "0.1.2-DEV"]]

@@ -52,12 +52,14 @@
 (defn image-display
   [path _]
   (let [preloaded? (subscribe [:preloaded? path])]
-    (fn [_ {:keys [width height]}]
+    (fn [_ {:keys [width height]} _]
       (if @preloaded?
         [:img {:src    path
-               :width  width
-               :height height}]
-        [box :width (str width "px") :height (str height "px") :child [throbber]]))))
+               :width  "100%"
+               :height "100%"}]
+        [box :width  (str width "px")
+             :height (str height "px")
+             :child  [throbber]]))))
 
 (defn image
   [path {:keys [aspect] :as metrics}]
@@ -68,17 +70,18 @@
                            :child [image-display path {:width "400" :height (/ 400 aspect)}]]
                       [image-info filename metrics]]]))
 
+(defn render-gallery
+  [rows]
+  [:div rows])
+
 (defn import-view
   []
-  (let [metrics (subscribe [:image-metrics])]
+  (let [metrics (subscribe [:loaded-images])]
     (fn []
-      [v-box :gap "1em"
-       :children  (reduce (fn [rows [path metrics]]
-                            (conj rows
-                                  ^{:key path}
-                                  [image path metrics]))
-                          []
-                          @metrics)])))
+      (when @metrics
+        [box :child [perfect-layout :items      metrics
+                                    :item-fn    image-display
+                                    :gallery-fn render-gallery]]))))
 
 (defn root-component
   []
