@@ -2,7 +2,6 @@
   (:require [goog.events]
             [reagent.core :as reagent]
             [re-frame.core :refer [reg-sub reg-event-db subscribe dispatch dispatch-sync]]
-            [layout.views :as views]
             ;; Need to include 'subs' and 'events' explicitely for Google Closure Compiler.
             [layout.subs]
             [layout.events]
@@ -37,15 +36,15 @@
        :reagent-render
        (fn [& {:keys [gap]}]
          [:div
-          {:style {:width "100%"
+          {:style {:width    "100%"
+                   :height   (str (first @paint-list) "px")
                    :position "relative"}}
-          (pprint @paint-list)
           (doall
-            (for [{:keys [id x y width height]} @paint-list]
-              ^{:key id}
+            (for [p-rect (second @paint-list)]
+              ^{:key (:id p-rect)}
               [:div {:style {:position "absolute"
-                             :left     x
-                             :top      y
-                             :width    width
-                             :height   height}}
-               [item-fn id]]))])})))
+                             :left     (:x p-rect)
+                             :top      (:y p-rect)
+                             :width    (:width p-rect)
+                             :height   (:height p-rect)}}
+               [item-fn (:id p-rect)]]))])})))

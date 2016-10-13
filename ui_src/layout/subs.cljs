@@ -14,7 +14,7 @@
   return the ideal number of rows for the gallery layout."
   [{:keys [width height]} aspects]
   (.round js/Math
-          (/ (* (/ height 2) (reduce + aspects))
+          (/ (* (/ height 3) (reduce + aspects))
              width)))
 
 (defn aspect-weight [a] (* a 100))
@@ -58,20 +58,6 @@
   (fn [[_ items]] (subscribe [:album-layout/layout items]))
   (fn [layout] (row-aspect-map layout)))
 
-(defn scale-layout
-  "Return a layout which contains explicit dimensions for items."
-  [{:keys [box] :as window} layout gap]
-  (let [width (:width box)]
-    (map-indexed (fn [row-idx [aspect-sum row]]
-                   (let [gap-width (* gap (dec (count row)))
-                         width'    (- width gap-width)
-                         height    (/ width' aspect-sum)]
-                     (map-indexed (fn [col-idx [id {:keys [aspect] :as data}]]
-                                    (let [new-box (mk-rect (* aspect height) height)]
-                                      [id new-box {:row row-idx :col col-idx}]))
-                                  row)))
-                 layout)))
-
 (defn ->sized-row
   [width gap [aspect-sum row]]
   [row
@@ -107,12 +93,4 @@
                     y'             (+ y height gap)]
                 (recur 0 y' paint-list height' row' (rest layout)))
 
-              :default (persistent! paint-list))))))
-;;
-(reg-sub
-  :album-layout/scaled-layout
-  (fn [[_ items _]]
-    [(subscribe [:album-layout/window (hash items)])
-     (subscribe [:album-layout/summed-layout items])])
-  (fn [[window layout] [_ _ gap]]
-    (scale-layout window layout gap)))
+              :default [(+ y height) (persistent! paint-list)])))))
