@@ -30,7 +30,7 @@
                       :tooltip          "Albums"
                       :tooltip-position :right-center
                       :emphasise?       (= :albums-view @current-view)
-                      :on-click         #(dispatch [:controls/set-view :albums-view])])));;
+                      :on-click         #(dispatch [:controls/set-view :albums-view])])))
 
 (defn expand-sidebar-button
   []

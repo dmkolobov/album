@@ -5,7 +5,7 @@
 (defonce file-path (js/require "path"))
 
 (defrecord ImageAsset
-  [filesize last-modified size])
+  [filesize taken-at last-modified size])
 
 (def image-intercept [async-action trim-v])
 
