@@ -23,7 +23,7 @@
 
 (enable-console-print!)
 
-(defn photos-view
+(defn photos-content
   []
   (let [metrics (subscribe [:loaded-images])]
     (fn []
@@ -33,16 +33,37 @@
                                :child [perfect-layout :items   metrics
                                                       :gap     6
                                                       :item-fn images/render]]]]))))
-(defn root-component
-  []
+
+(defn base-view
+  [& {:keys [toolbar content]}]
   [v-box :size       "auto"
          :max-height "100%"
-         :children [[controls/toolbar]
+         :children [toolbar
                     [h-box :size     "auto"
                            :children [[controls/sidebar]
                                       [scroller :size       "auto"
                                                 :max-height "100%"
-                                                :child      [photos-view]]]]]])
+                                                :child      content]]]]])
+
+(defn photos-view
+  []
+  [base-view :toolbar [controls/toolbar :title "Photos"]
+             :content [photos-content]])
+
+(defn albums-view
+  []
+  [base-view :toolbar [controls/toolbar :title "Albums"]
+             :content [:div "Coming soon..."]])
+
+(def views
+  {:photos-view [photos-view]
+   :albums-view [albums-view]})
+
+(defn root-component
+  []
+  (let [current-view (subscribe [:controls/current-view])]
+    (fn []
+     (get views @current-view))))
 
 (reagent/render
   [root-component]

@@ -4,4 +4,4 @@
 (reg-sub
   :controls/current-view
   (fn [db]
-    (get db :controls/current-view)))
+    (get db :controls/current-view :photos-view)))
