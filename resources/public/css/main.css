@@ -2,6 +2,14 @@
 
 }
 
+html, body, #app-container {
+  height: 100%;
+}
+
+body {
+  background: #E0E0E0;
+}
+
 .property-list-title {
   font-weight:    bold;
   font-size:      2em;

@@ -3,8 +3,9 @@
   "version":      "0.1.0",
   "main":         "resources/main.js",
   "dependencies": {
-    "ncp": "2.0.0",
-    "gm":  "1.23.0",
-    "fs-extra": "0.30.0"
+    "ncp":                 "2.0.0",
+    "gm":                  "1.23.0",
+    "fs-extra":            "0.30.0",
+    "linear-partitioning": "0.3.1"
   }
 }

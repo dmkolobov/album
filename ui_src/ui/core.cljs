@@ -1,11 +1,11 @@
 (ns ui.core
   (:require [reagent.core :as reagent :refer [atom]]
             [re-frame.core :refer [reg-event-fx reg-fx trim-v reg-event-db reg-sub dispatch subscribe]]
-            [re-com.core :refer [h-box v-box box throbber title label button]]
+            [re-com.core :refer [h-box v-box box throbber title label button scroller h-split]]
             [day8.re-frame.async-flow-fx]
             [re-com.core]
 
-            [album-layout.core :refer [perfect-layout]]
+            [layout.core :refer [perfect-layout]]
 
             [cljs.pprint :refer [pprint]]
 
@@ -18,22 +18,14 @@
 
 (enable-console-print!)
 
-;; ---- common events ----
-;; -----------------------
-
-(reg-event-db
-  :write-to
-  [trim-v]
-  (fn [db [path val]] (assoc-in db path val)))
-
 ;; ---- views ----
 ;; ---------------
 
 (defonce file-path (js/require "path"))
 
 (defn image-info
-  [filename {:keys [size filesize aspect]}]
-  [v-box :children [[title :label filename :class "property-list-title"]
+  [path {:keys [size filesize aspect]}]
+  [v-box :children [[title :label (.basename file-path path) :class "property-list-title"]
                     [h-box :children [[label :label "Dimensions" :class "property-list-label"]
                                       [label :label (if size
                                                       (str (:width size) " X " (:height size))
@@ -50,44 +42,40 @@
                                                       [throbber :size :small])]]]]])
 
 (defn image-display
-  [path _]
+  [path _ _]
   (let [preloaded? (subscribe [:preloaded? path])]
-    (fn [_ {:keys [width height]} _]
+    (fn [path                   ;; the id of the layout item
+         {:keys [width height]} ;; the dimensions of the space given to the layout item
+         {:keys [row col]}]     ;; the row number and the column offset of the layout item
       (if @preloaded?
         [:img {:src    path
                :width  "100%"
-               :height "100%"}]
-        [box :width  (str width "px")
-             :height (str height "px")
-             :child  [throbber]]))))
-
-(defn image
-  [path {:keys [aspect] :as metrics}]
-  (let [filename (.basename file-path path)]
-    [h-box :class    "property-list"
-           :gap      "1em"
-           :children [[box :size "none"
-                           :child [image-display path {:width "400" :height (/ 400 aspect)}]]
-                      [image-info filename metrics]]]))
-
-(defn render-gallery
-  [rows]
-  [:div rows])
+               :height "100%"
+               :style  {:box-shadow "0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23)"}
+               :on-click #(js/alert (str "clicked: " path ", row " row ", col " col))}]
+        [box :child [throbber]]))))
 
 (defn import-view
   []
   (let [metrics (subscribe [:loaded-images])]
     (fn []
       (when @metrics
-        [box :child [perfect-layout :items      metrics
-                                    :item-fn    image-display
-                                    :gallery-fn render-gallery]]))))
+        [box :size  "100%"
+             :padding "1em 1em 10em 1em"
+             :child [perfect-layout :items      metrics
+                                    :gap        6
+                                    :item-fn    image-display]]))))
 
 (defn root-component
   []
-  [v-box :children [[button :label    "Import"
-                            :on-click #(dispatch [:start-import])]
-                    [import-view]]])
+  [h-box :height "100%"
+         :children [[box :size  "none"
+                         :style {:background "white"
+                                 :height     "100%"}
+                         :child [button :label    "Import"
+                                        :on-click #(dispatch [:start-import])]]
+                    [scroller :size  "auto"
+                              :child [import-view]]]])
 
 (reagent/render
   [root-component]
