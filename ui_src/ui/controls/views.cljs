@@ -1,5 +1,5 @@
 (ns ui.controls.views
-  (:require [re-frame.core :refer [dispatch]]
+  (:require [re-frame.core :refer [subscribe dispatch]]
             [re-com.core :refer [md-icon-button v-box box h-box title]]))
 
 (defn import-button
@@ -12,11 +12,14 @@
 
 (defn album-button
   []
-  [md-icon-button :md-icon-name     "zmdi-image"
-                  :size             :larger
-                  :tooltip          "Photos"
-                  :tooltip-position :right-center
-                  :on-click         #(println "foobar")])
+  (let [current-view (subscribe [:controls/current-view])]
+    (fn []
+      [md-icon-button :md-icon-name     "zmdi-image"
+                      :size             :larger
+                      :tooltip          "Photos"
+                      :tooltip-position :right-center
+                      :emphasise?       (= :photos-view @current-view)
+                      :on-click         #(dispatch [:controls/set-view :photos-view])])));;
 
 (defn expand-sidebar-button
   []
@@ -34,7 +37,8 @@
 
 (defn toolbar
   []
-  [h-box :size     "none"
+  [h-box :class    "toolbar"
+         :size     "none"
          :gap      "2em"
          :padding  "1em 2em"
          :align    :baseline

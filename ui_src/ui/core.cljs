@@ -17,7 +17,9 @@
             [ui.images.subs]
             [ui.images.views :as images]
 
-            [ui.controls.views :as controls]))
+            [ui.controls.views :as controls]
+            [ui.controls.events]
+            [ui.controls.subs]))
 
 (enable-console-print!)
 
