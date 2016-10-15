@@ -23,16 +23,29 @@
 
 (enable-console-print!)
 
+(defn gallery
+  [date-string]
+  (let [images (subscribe [:images/date-filter date-string])]
+    (fn [_]
+      [v-box :size    "none"
+             :padding "1em 1em 1em 0"
+             :gap     "1em"
+             :children [[title :label date-string
+                                     :level :level3]
+                              (when @images
+                                [box :child   [perfect-layout :items   images
+                                                              :gap     6
+                                                              :item-fn images/render]])]])))
+
 (defn photos-content
   []
-  (let [metrics (subscribe [:loaded-images])]
+  (let [dates (subscribe [:images/date-filters])]
     (fn []
-      (when @metrics
-        [v-box :size "auto"
-               :children [[box :padding "1em 1em 1em 0"
-                               :child [perfect-layout :items   metrics
-                                                      :gap     6
-                                                      :item-fn images/render]]]]))))
+      [v-box :size     "auto"
+             :children (doall (map (fn [date]
+                                     ^{:key date}
+                                     [gallery date])
+                                   @dates))])))
 
 (defn base-view
   [& {:keys [toolbar content]}]
