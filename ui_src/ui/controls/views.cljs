@@ -18,8 +18,8 @@
                       :size             :larger
                       :tooltip          "Photos"
                       :tooltip-position :right-center
-                      :emphasise?       (= :photos-view @current-view)
-                      :on-click         #(dispatch [:controls/set-view :photos-view])])))
+                      :emphasise?       (= [:photos-view] @current-view)
+                      :on-click         #(dispatch [:controls/set-view [:photos-view]])])))
 
 (defn albums-button
   []
@@ -29,16 +29,8 @@
                       :size             :larger
                       :tooltip          "Albums"
                       :tooltip-position :right-center
-                      :emphasise?       (= :albums-view @current-view)
-                      :on-click         #(dispatch [:controls/set-view :albums-view])])))
-
-(defn expand-sidebar-button
-  []
-  [md-icon-button :md-icon-name     "zmdi-menu"
-                  :size             :larger
-                  :tooltip          "Main menu"
-                  :tooltip-position :below-center
-                  :on-click         #(println "opening menu")])
+                      :emphasise?       (= [:albums-view] @current-view)
+                      :on-click         #(dispatch [:controls/set-view [:albums-view]])])))
 
 (defn sidebar
   []
@@ -50,15 +42,28 @@
                     [albums-button]]])
 
 (defn toolbar
-  [& {:keys [title]}]
-  [h-box :class    "toolbar"
+  [& {:keys [icon tooltip on-click content class]}]
+  [h-box :class    (str "toolbar " class)
          :size     "none"
          :gap      "2em"
          :padding  "1em 2em"
          :align    :baseline
-         :children [[expand-sidebar-button]
-                    [re-com/title :level         :level2
-                                  :margin-top    "0px"
-                                  :margin-bottom "0px"
-                                  :label         title]
-                    [import-button]]])
+         :children [[md-icon-button :md-icon-name     icon
+                                    :size             :larger
+                                    :tooltip          tooltip
+                                    :tooltip-position :below-center
+                                    :on-click         on-click]
+                    content]])
+
+(defn main-toolbar
+  [& {:keys [title]}]
+  [toolbar :icon     "zmdi-menu"
+           :tooltip  "Main menu"
+           :on-click #(println "opening main menu")
+           :content  [h-box :size "none"
+                            :align :baseline
+                            :children [[re-com/title :level :level2
+                                                     :margin-top    "0px"
+                                                     :margin-bottom "0px"
+                                                     :label title]
+                                       [import-button]]]])

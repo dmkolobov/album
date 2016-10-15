@@ -84,33 +84,34 @@
 
 (defn build-paint-list
   [{:keys [width]} gap scaled-layout]
-  (loop [x              0
-         y              0
-         height         (first (first scaled-layout))
-         current-row    (second (first scaled-layout))
-         remaining-rows (rest scaled-layout)
-         paint-list     (transient [])]
-    (cond (seq current-row)
-          (let [[id {:keys [aspect]}] (first current-row)
-                width (* aspect height)
-                rect  (PaintRect. id x y width height)]
-            (recur (+ x width gap)
-                   y
-                   height
-                   (rest current-row)
-                   remaining-rows
-                   (conj! paint-list rect)))
+  (let [[first-height first-row] (first scaled-layout)]
+    (loop [x              0
+           y              0
+           height         first-height
+           current-row    first-row
+           remaining-rows (rest scaled-layout)
+           paint-list     (transient [])]
+      (cond (seq current-row)
+            (let [[id {:keys [aspect]}] (first current-row)
+                  width                 (* aspect height)
+                  rect                  (PaintRect. id x y width height)]
+              (recur (+ x width gap)
+                     y
+                     height
+                     (rest current-row)
+                     remaining-rows
+                     (conj! paint-list rect)))
 
-          (seq remaining-rows)
-          (let [[row-height row] (first remaining-rows)]
-            (recur 0
-                   (+ y height gap)
-                   row-height
-                   row
-                   (rest remaining-rows)
-                   paint-list))
+            (seq remaining-rows)
+            (let [[row-height row] (first remaining-rows)]
+              (recur 0
+                     (+ y height gap)
+                     row-height
+                     row
+                     (rest remaining-rows)
+                     paint-list))
 
-          :default [(+ y height) (persistent! paint-list)])))
+            :default [(+ y height) (persistent! paint-list)]))))
 
 (reg-sub
   :album-layout/paint-list

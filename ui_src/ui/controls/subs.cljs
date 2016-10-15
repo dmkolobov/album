@@ -4,4 +4,5 @@
 (reg-sub
   :controls/current-view
   (fn [db]
-    (get db :controls/current-view :photos-view)))
+    (peek
+      (get db :controls/view-stack [[:photos-view]]))))

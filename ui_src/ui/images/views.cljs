@@ -3,11 +3,12 @@
             [re-com.core :refer [box throbber]]))
 
 (defn render
-  [path]
+  [& {:keys [path on-click]}]
   (let [preloaded? (subscribe [:preloaded? path])]
-    (fn [path]
+    (fn [_]
       (if @preloaded?
-        [:img.image {:src path}]
+        [:img.image (merge {:src path}
+                           (when on-click {:on-click on-click}))]
         [box :class   "image-throbber"
              :align   :center
              :justify :center

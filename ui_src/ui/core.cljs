@@ -23,30 +23,34 @@
 
 (enable-console-print!)
 
+(defn index-image
+  [path]
+  [images/render :path     path
+                 :on-click #(dispatch [:controls/push-view [:photo-view path]])])
+
 (defn gallery
   [date-string]
   (let [images (subscribe [:images/date-filter date-string])]
     (fn [_]
-      [v-box :size    "none"
-             :gap     "1em"
+      [v-box :size     "none"
+             :gap      "1em"
              :children [[title :label date-string
-                                     :level :level3]
-                              (when @images
-                                [box :child   [perfect-layout :items   images
-                                                              :gap     6
-                                                              :item-fn images/render]])]])))
+                               :level :level3]
+                        (when @images
+                          [box :child [perfect-layout :items   images
+                                                      :gap     6
+                                                      :item-fn index-image]])]])))
 
 (defn photos-content
   []
   (let [dates (subscribe [:images/date-filters])]
     (fn []
-      [v-box :size    "auto"
-             :padding "1em 1em 1em 0"
-             :gap     "1em"
+      [v-box :size     "auto"
+             :padding  "1em 1em 1em 0"
+             :gap      "1em"
              :children (doall (map (fn [date]
-                                           ^{:key date}
-                                           [gallery date])
-                                         @dates))])))
+                                     ^{:key date} [gallery date])
+                                   @dates))])))
 
 (defn base-view
   [& {:keys [toolbar content]}]
@@ -57,27 +61,49 @@
                            :children [[controls/sidebar]
                                       [scroller :size       "auto"
                                                 :max-height "100%"
-                                                :child      content]]]]]);;
+                                                :child      content]]]]])
+
+(defn stacked-view
+  [& {:keys [toolbar-content content]}]
+  [v-box :size     "auto"
+         :height   "100%"
+         :children [[controls/toolbar :icon     "zmdi-arrow-left"
+                                      :tooltip  "Close"
+                                      :on-click #(dispatch [:controls/pop-view])
+                                      :content  toolbar-content]
+                    content]])
+
+(defn photo-view
+  [path]
+  [stacked-view :content [box :size       "auto"
+                              :height     "100%"
+                              :padding    "1em"
+                              :align-self :center
+                              :align      :center
+                              :child      [images/render :path path]]])
 
 (defn photos-view
   []
-  [base-view :toolbar [controls/toolbar :title "Photos"]
+  [base-view :toolbar [controls/main-toolbar :title "Photos"]
              :content [photos-content]])
 
 (defn albums-view
   []
-  [base-view :toolbar [controls/toolbar :title "Albums"]
+  [base-view :toolbar [controls/main-toolbar :title "Albums"]
              :content [:div "Coming soon..."]])
 
 (def views
-  {:photos-view [photos-view]
-   :albums-view [albums-view]})
+  {:photo-view  photo-view
+   :photos-view photos-view
+   :albums-view albums-view})
 
 (defn root-component
   []
   (let [current-view (subscribe [:controls/current-view])]
     (fn []
-     (get views @current-view))))
+      (let [[view-id & args] @current-view]
+        (into [(get views view-id)]
+              args)))))
 
 (reagent/render
   [root-component]
