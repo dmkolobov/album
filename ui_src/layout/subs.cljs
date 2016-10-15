@@ -9,12 +9,14 @@
 
 (defonce linear-partition (js/require "linear-partitioning"))
 
+(def photos-per-screen 3.5)
+
 (defn compute-rows
   "Given the window dimensions and a sequence of item aspect ratios,
   return the ideal number of rows for the gallery layout."
   [{:keys [width height]} aspects]
   (.round js/Math
-          (/ (* (/ height 3) (reduce + aspects))
+          (/ (* (/ height photos-per-screen) (reduce + aspects))
              width)))
 
 (defn aspect-weight [a] (* a 100))
@@ -71,7 +73,7 @@
   [{:keys [width height]} gap layout]
   (conj (mapv #(->scaled-row width gap %) (butlast layout))
         (let [[row-aspect last-row]   (last layout)
-              row-height (/ height 3)
+              row-height (/ height photos-per-screen)
               row-width  (- (* row-height row-aspect)
                             (* gap (dec (count last-row))))]
           (if (> row-width width)

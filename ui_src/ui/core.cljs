@@ -28,7 +28,6 @@
   (let [images (subscribe [:images/date-filter date-string])]
     (fn [_]
       [v-box :size    "none"
-             :padding "1em 1em 1em 0"
              :gap     "1em"
              :children [[title :label date-string
                                      :level :level3]
@@ -41,11 +40,13 @@
   []
   (let [dates (subscribe [:images/date-filters])]
     (fn []
-      [v-box :size     "auto"
+      [v-box :size    "auto"
+             :padding "1em 1em 1em 0"
+             :gap     "1em"
              :children (doall (map (fn [date]
-                                     ^{:key date}
-                                     [gallery date])
-                                   @dates))])))
+                                           ^{:key date}
+                                           [gallery date])
+                                         @dates))])))
 
 (defn base-view
   [& {:keys [toolbar content]}]
@@ -56,7 +57,7 @@
                            :children [[controls/sidebar]
                                       [scroller :size       "auto"
                                                 :max-height "100%"
-                                                :child      content]]]]])
+                                                :child      content]]]]]);;
 
 (defn photos-view
   []
