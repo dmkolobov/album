@@ -1,6 +1,6 @@
 (ns ui.controls.views
   (:require [re-frame.core :refer [subscribe dispatch]]
-            [re-com.core :refer [md-icon-button v-box box h-box title]]))
+            [re-com.core :as re-com :refer [md-icon-button v-box box h-box]]))
 
 (defn import-button
   []
@@ -50,15 +50,15 @@
                     [albums-button]]])
 
 (defn toolbar
-  []
+  [& {:keys [title]}]
   [h-box :class    "toolbar"
          :size     "none"
          :gap      "2em"
          :padding  "1em 2em"
          :align    :baseline
          :children [[expand-sidebar-button]
-                    [title :level :level2
-                           :margin-top "0px"
-                           :margin-bottom "0px"
-                           :label "Photos"]
+                    [re-com/title :level         :level2
+                                  :margin-top    "0px"
+                                  :margin-bottom "0px"
+                                  :label         title]
                     [import-button]]])
