@@ -34,10 +34,13 @@
   sequences containing item entries laid out according to the partition
   algorithm."
   [items window-base]
-  (let [aspects  (map item-aspect items)
-        num-rows (compute-rows window-base aspects)]
-    (map (partial map (selector item-weight items))
-         (compute-partitions aspects num-rows))))
+  (let [aspects    (map item-aspect items)
+        num-rows   (compute-rows window-base aspects)
+        select     (selector item-weight items)
+        partitions (compute-partitions aspects num-rows)]
+    (if (seq partitions)
+      (map #(map select %) partitions)
+      [items])))
 
 (reg-sub
   :album-layout/layout
@@ -58,13 +61,54 @@
   (fn [[_ items]] (subscribe [:album-layout/layout items]))
   (fn [layout] (row-aspect-map layout)))
 
-(defn ->sized-row
+(defn ->scaled-row
   [width gap [aspect-sum row]]
-  [row
-   (/ (- width (* gap (dec (count row))))
-      aspect-sum)])
+  [(/ (- width (* gap (dec (count row))))
+      aspect-sum)
+   row])
+
+(defn scale-layout
+  [{:keys [width height]} gap layout]
+  (conj (mapv #(->scaled-row width gap %) (butlast layout))
+        (let [[row-aspect last-row]   (last layout)
+              row-height (/ height 3)
+              row-width  (- (* row-height row-aspect)
+                            (* gap (dec (count last-row))))]
+          (if (> row-width width)
+            (->scaled-row width gap (last layout))
+            [row-height last-row]))))
 
 (defrecord PaintRect [id x y width height])
+
+(defn build-paint-list
+  [{:keys [width]} gap scaled-layout]
+  (loop [x              0
+         y              0
+         height         (first (first scaled-layout))
+         current-row    (second (first scaled-layout))
+         remaining-rows (rest scaled-layout)
+         paint-list     (transient [])]
+    (cond (seq current-row)
+          (let [[id {:keys [aspect]}] (first current-row)
+                width (* aspect height)
+                rect  (PaintRect. id x y width height)]
+            (recur (+ x width gap)
+                   y
+                   height
+                   (rest current-row)
+                   remaining-rows
+                   (conj! paint-list rect)))
+
+          (seq remaining-rows)
+          (let [[row-height row] (first remaining-rows)]
+            (recur 0
+                   (+ y height gap)
+                   row-height
+                   row
+                   (rest remaining-rows)
+                   paint-list))
+
+          :default [(+ y height) (persistent! paint-list)])))
 
 (reg-sub
   :album-layout/paint-list
@@ -72,25 +116,6 @@
     [(subscribe [:album-layout/window (hash items)])
      (subscribe [:album-layout/summed-layout items])])
   (fn [[{:keys [box] :as window} layout] [_ _ gap]]
-    (let [width        (:width box)
-          [row height] (->sized-row width gap (first layout))]
-      (loop [x          0
-             y          0
-             paint-list (transient [])
-             height     height
-             row        row
-             layout     (rest layout)]
-        (cond (seq row)
-              (let [[id {:keys [aspect] :as data}] (first row)
-                    width       (* aspect height)
-                    paint-list' (conj! paint-list
-                                       (PaintRect. id x y width height))
-                    x'          (+ x width gap)]
-                (recur x' y paint-list' height (rest row) layout))
-
-              (seq layout)
-              (let [[row' height'] (->sized-row width gap (first layout))
-                    y'             (+ y height gap)]
-                (recur 0 y' paint-list height' row' (rest layout)))
-
-              :default [(+ y height) (persistent! paint-list)])))))
+    (->> layout
+         (scale-layout box gap)
+         (build-paint-list box gap))))
