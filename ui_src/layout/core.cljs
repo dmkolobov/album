@@ -14,6 +14,34 @@
   [layout-id node scale-increment]
   #(dispatch [:album-layout/container-resized layout-id (node-dimensions node) scale-increment]))
 
+(defn render-paint-list
+  "Given a paint list and an item render-fn, render each item in its
+  correct absolute position and with the correct dimensions."
+  [render-fn [layout-height rect-list :as paint-list]]
+  [:div
+   {:style {:width    "100%"
+            :height   (str layout-height "px")
+            :position "relative"}}
+   (doall
+     (for [{:keys [x y width height id]} rect-list]
+       ^{:key (str id)}
+       [:div
+        {:style {:position "absolute"
+                 :left     x
+                 :top      y
+                 :width    width
+                 :height   height}}
+        [render-fn id]]))])
+
+(defn watch-dimensions!
+  [layout-id scale-increment node]
+  (let [on-resize! (resize-handler layout-id node scale-increment)]
+    (.listen goog.events
+             js/window
+             (.-RESIZE (.-EventType goog.events))
+             on-resize!)
+    (on-resize!)))
+
 (defn perfect-layout
   [& {:keys [items
              item-fn
@@ -26,25 +54,9 @@
     (reagent/create-class
       {:component-did-mount
        (fn [owner]
-         (let [node       (reagent/dom-node owner)
-               on-resize! (resize-handler layout-id node scale-increment)]
-           (.listen goog.events
-                    js/window
-                    (.-RESIZE (.-EventType goog.events))
-                    on-resize!)
-           (on-resize!)))
+         (watch-dimensions! layout-id
+                            scale-increment
+                            (reagent/dom-node owner)))
        :reagent-render
        (fn [& {:keys [gap]}]
-         [:div
-          {:style {:width    "100%"
-                   :height   (str (first @paint-list) "px")
-                   :position "relative"}}
-          (doall
-            (for [p-rect (second @paint-list)]
-              ^{:key (:id p-rect)}
-              [:div {:style {:position "absolute"
-                             :left     (:x p-rect)
-                             :top      (:y p-rect)
-                             :width    (:width p-rect)
-                             :height   (:height p-rect)}}
-               [item-fn (:id p-rect)]]))])})))
+         (render-paint-list item-fn @paint-list))})))

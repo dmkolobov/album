@@ -31,6 +31,11 @@
 
 (defn item-weight [i] (* 100 (item-aspect i)))
 
+(defn by-row-aspect
+  [layout]
+  (map (fn [items] [(reduce + (map item-aspect items)) items])
+       layout))
+
 (defn compute-layout
   "Given a sequence of items and the window dimensions, return a sequence of
   sequences containing item entries laid out according to the partition
@@ -40,9 +45,10 @@
         num-rows   (compute-rows window-base aspects)
         select     (selector item-weight items)
         partitions (compute-partitions aspects num-rows)]
-    (if (seq partitions)
-      (map #(map select %) partitions)
-      [items])))
+    (by-row-aspect
+      (if (seq partitions)
+        (map #(map select %) partitions)
+        [items]))))
 
 (reg-sub
   :album-layout/layout
@@ -53,16 +59,6 @@
     (when window-base
       (compute-layout items window-base))))
 
-(defn row-aspect-map
-  [layout]
-  (map (fn [items] [(reduce + (map item-aspect items)) items])
-       layout))
-
-(reg-sub
-  :album-layout/summed-layout
-  (fn [[_ items]] (subscribe [:album-layout/layout items]))
-  (fn [layout] (row-aspect-map layout)))
-
 (defn ->scaled-row
   [width gap [aspect-sum row]]
   [(/ (- width (* gap (dec (count row))))
@@ -70,6 +66,8 @@
    row])
 
 (defn scale-layout
+  "Given a screen rect, a gap specified in pixels, and a sequence of
+  laid out rows, return a sequence of [row-height row] pairs."
   [{:keys [width height]} gap layout]
   (conj (mapv #(->scaled-row width gap %) (butlast layout))
         (let [[row-aspect last-row]   (last layout)
@@ -114,10 +112,10 @@
             :default [(+ y height) (persistent! paint-list)]))))
 
 (reg-sub
-  :album-layout/paint-list
+  :album-layout/paint-list;;
   (fn [[_ items _]]
     [(subscribe [:album-layout/window (hash items)])
-     (subscribe [:album-layout/summed-layout items])])
+     (subscribe [:album-layout/layout items])])
   (fn [[{:keys [box] :as window} layout] [_ _ gap]]
     (->> layout
          (scale-layout box gap)
