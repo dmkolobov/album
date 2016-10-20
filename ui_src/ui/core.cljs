@@ -16,7 +16,7 @@
             [ui.images.events]
             [ui.images.subs]
             [ui.images.views :as images]
-
+            
             [ui.controls.views :as controls]
             [ui.controls.events]
             [ui.controls.subs]))
@@ -38,7 +38,7 @@
                                :level :level3]
                         (when @images
                           [box :child [perfect-layout :items   images
-                                                      :gap     6
+                                                      :gap     6.66
                                                       :item-fn index-image]])]])))
 
 (defn photos-content

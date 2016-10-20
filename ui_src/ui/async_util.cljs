@@ -13,7 +13,7 @@
                           :on-success [:async/success event]
                           :on-error   [:async/error event]))))))
 
-(reg-event-db :async/success (fn [db v] (println v) db))
+(reg-event-db :async/success (fn [db v] db))
 (reg-event-db :async/error (fn [db v]
                              (throw js/Error "myerror")
                              db))

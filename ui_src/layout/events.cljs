@@ -1,25 +1,25 @@
 (ns layout.events
   (:require [re-frame.core :refer [reg-cofx reg-event-db reg-event-fx inject-cofx trim-v]]))
 
-(defrecord LayoutContainer [base-box box])
+(defrecord LayoutContainer [base-rect scale-rect])
 
 (defn ^boolean should-layout?
-  [delta rect new-rect]
+  [step rect new-rect]
   (> (.abs js/Math
            (- (:width rect)
               (:width new-rect)))
-     delta))
+     step))
 
-(defn handle-container-resized
-  [{:keys [db]} [layout-id new-base scale-increment]]
+(defn handle-update-metrics
+  [{:keys [db]} [layout-id rect step]]
   {:db
    (update-in db
-              [:album-layout/containers layout-id]
-              (fn [{:keys [base-box] :as container}]
-                (if (should-layout? scale-increment base-box new-base)
-                  (LayoutContainer. new-base new-base)
-                  (assoc container :box new-base))))})
+              [:layouts/metrics layout-id]
+              (fn [{:keys [base-rect] :as container}]
+                (if (should-layout? step base-rect rect)
+                  (LayoutContainer. rect rect)
+                  (assoc container :scale-rect rect))))})
 
-(reg-event-fx :album-layout/container-resized
+(reg-event-fx :layouts/update-metrics
               [trim-v]
-              handle-container-resized)
+              handle-update-metrics)

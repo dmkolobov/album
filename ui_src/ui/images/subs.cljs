@@ -10,11 +10,16 @@
   (fn [db _]
     (subscribe [:image-metrics]))
   (fn [image-metrics _]
-    (filter #(contains? (second %) :aspect) image-metrics)))
+    (filter (fn [[path {:keys [aspect taken-at]}]]
+              (and (some? aspect) (some? taken-at)))
+            image-metrics)))
 
 (defn date-string
   [date]
   (.toDateString date))
+
+;; Returns a sequence of date strings, sorted in descending
+;; order.
 
 (reg-sub
   :images/date-filters

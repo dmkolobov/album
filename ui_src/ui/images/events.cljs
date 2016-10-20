@@ -1,11 +1,15 @@
 (ns ui.images.events
   (:require [re-frame.core :refer [reg-event-fx reg-event-db trim-v]]
-            [ui.async-util :refer [async-action]]))
+            [ui.async-util :refer [async-action]]
+            [layout.data :as layouts]))
 
 (defonce file-path (js/require "path"))
 
 (defrecord ImageAsset
-  [filesize taken-at last-modified size])
+  [filesize taken-at last-modified size aspect]
+
+  layouts/IWillLayout
+  (aspect [this] (:aspect this)))
 
 (def image-intercept [async-action trim-v])
 

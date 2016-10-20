@@ -5,25 +5,39 @@
             ;; Need to include 'subs' and 'events' explicitely for Google Closure Compiler.
             [layout.subs]
             [layout.events]
-            [cljs.pprint :refer [pprint]]
-            [layout.util :refer [node-dimensions]]))
+            [cljs.pprint :refer [pprint]]))
 
 (enable-console-print!)
 
-(defn resize-handler
-  [layout-id node scale-increment]
-  #(dispatch [:album-layout/container-resized layout-id (node-dimensions node) scale-increment]))
+(defrecord Rect [width height])
 
-(defn render-paint-list
+(defn node-dimensions
+  "Given a DOM element, return a map containing the width
+  and height of the element."
+  [node]
+  (let [rect (.getBoundingClientRect node)]
+    (Rect. (js/parseInt
+             (min (.-width rect)
+                  (.-innerWidth js/window)))
+           (.-innerHeight js/window))))
+
+(defn resize-handler
+  [layout-id node step]
+  #(dispatch [:layouts/update-metrics
+              layout-id
+              (node-dimensions node)
+              step]))
+
+(defn paint-layout
   "Given a paint list and an item render-fn, render each item in its
   correct absolute position and with the correct dimensions."
-  [render-fn [layout-height rect-list :as paint-list]]
+  [render-fn {:keys [rect paint-list] :as layout}]
   [:div
    {:style {:width    "100%"
-            :height   (str layout-height "px")
+            :height   (str (:height rect) "px")
             :position "relative"}}
    (doall
-     (for [{:keys [x y width height id]} rect-list]
+     (for [{:keys [x y width height id]} paint-list]
        ^{:key (str id)}
        [:div
         {:style {:position "absolute"
@@ -33,9 +47,9 @@
                  :height   height}}
         [render-fn id]]))])
 
-(defn watch-dimensions!
-  [layout-id scale-increment node]
-  (let [on-resize! (resize-handler layout-id node scale-increment)]
+(defn measure-node!
+  [window-id node step]
+  (let [on-resize! (resize-handler window-id node step)]
     (.listen goog.events
              js/window
              (.-RESIZE (.-EventType goog.events))
@@ -45,18 +59,18 @@
 (defn perfect-layout
   [& {:keys [items
              item-fn
-             scale-increment
+             step
              gap]
-      :or {scale-increment 100
-           gap             0}}]
-  (let [layout-id  (hash items)
-        paint-list (subscribe [:album-layout/paint-list items gap])]
+      :or {step 100
+           gap  0}}]
+  (let [window-id (hash items)
+        layout    (subscribe [:layouts/perfect-layout window-id gap] [items])]
     (reagent/create-class
       {:component-did-mount
        (fn [owner]
-         (watch-dimensions! layout-id
-                            scale-increment
-                            (reagent/dom-node owner)))
+         (measure-node! window-id
+                        (reagent/dom-node owner)
+                        step))
        :reagent-render
        (fn [& {:keys [gap]}]
-         (render-paint-list item-fn @paint-list))})))
+         (paint-layout item-fn @layout))})))

@@ -1,122 +1,157 @@
 (ns layout.subs
   (:require [re-frame.core :refer [reg-sub subscribe]]
-            [layout.util :refer [selector mk-rect]]))
+            [layout.data :refer [aspect map->PaintRect map->Layout]]))
 
-(reg-sub :album-layout/window (fn [db [_ gallery-id]] (get-in db [:album-layout/containers gallery-id])))
-(reg-sub :album-layout/window-base (fn [db [_ gallery-id]] (get-in db [:album-layout/containers gallery-id :base-box])))
-
-(defn item-aspect [[id {:keys [aspect]}]] aspect)
+(defn selector
+  [key-fn coll]
+  (let [cache (atom (group-by key-fn coll))]
+    (fn [k]
+      (let [item (first (get @cache k))]
+        (swap! cache update k rest)
+        item))))
+;;
+(def photos-per-screen 3.5)
 
 (defonce linear-partition (js/require "linear-partitioning"))
 
-(def photos-per-screen 3.5)
-
-(defn compute-rows
-  "Given the window dimensions and a sequence of item aspect ratios,
-  return the ideal number of rows for the gallery layout."
+(defn num-rows
   [{:keys [width height]} aspects]
   (.round js/Math
           (/ (* (/ height photos-per-screen) (reduce + aspects))
              width)))
 
-(defn aspect-weight [a] (* a 100))
+;; The layout rows are populated with items using a base window rect.
+;; This base rect is only updated when the window width is scaled
+;; more than some threshold.
+
+(defn item-weight [item] (* 100 (aspect (second item))))
 
 (defn compute-partitions
-  "Given a sequence of item aspects and the number of rows, return
-  a sequence of rows, each of which is a sequence of item aspects
-  whose sum is as equal as possible to the sums of other rows."
-  [aspects num-rows]
-  (linear-partition (clj->js (map aspect-weight aspects))
-                    num-rows))
+  [rect items]
+  (let [aspects (map (comp aspect second) items)
+        n       (num-rows rect aspects)]
+    (linear-partition (clj->js (map #(* 100 %) aspects))
+                      n)))
 
-(defn item-weight [i] (* 100 (item-aspect i)))
+(defn compute-rows
+  "Given a layout container rect and a sequence of items, return a sequence
+  of item sequences, where the sum of aspects in each item sequence is
+  as equal as possible."
+  [rect items]
+  (println "computing rows")
+  (let [select     (selector item-weight items)
+        partitions (compute-partitions rect items)]
+    (if (seq partitions)
+      (doall (map #(map select %) partitions))
+      [items])))
 
-(defn by-row-aspect
-  [layout]
-  (map (fn [items] [(reduce + (map item-aspect items)) items])
-       layout))
+(defn row-aspect [row] (reduce + (map (comp aspect second) row)))
 
-(defn compute-layout
-  "Given a sequence of items and the window dimensions, return a sequence of
-  sequences containing item entries laid out according to the partition
-  algorithm."
-  [items window-base]
-  (let [aspects    (map item-aspect items)
-        num-rows   (compute-rows window-base aspects)
-        select     (selector item-weight items)
-        partitions (compute-partitions aspects num-rows)]
-    (by-row-aspect
-      (if (seq partitions)
-        (map #(map select %) partitions)
-        [items]))))
+;; The rows are scaled using a different window rect. This window rect
+;; always reflects the size of the current window.
 
-(reg-sub
-  :album-layout/layout
-  (fn [[_ items]]
-    [items
-     (subscribe [:album-layout/window-base (hash items)])])
-  (fn [[items window-base] _]
-    (when window-base
-      (compute-layout items window-base))))
+(defn row-width
+  "Return the width of the 'row' accounting for 'gap' pixels between
+  each row item."
+  [row {:keys [width]} gap]
+  (- width (* gap (dec (count row)))));;
 
-(defn ->scaled-row
-  [width gap [aspect-sum row]]
-  [(/ (- width (* gap (dec (count row))))
-      aspect-sum)
+(defn fit-row
+  "Returns a pair [row-height row], so 'row-height' is defined so
+  that the row takes up the entire width of the enclosing 'rect',
+  accounting for 'gap' pixels between each row item."
+  [row rect gap]
+  [(/ (row-width row rect gap) (row-aspect row))
    row])
 
-(defn scale-layout
-  "Given a screen rect, a gap specified in pixels, and a sequence of
-  laid out rows, return a sequence of [row-height row] pairs."
-  [{:keys [width height]} gap layout]
-  (conj (mapv #(->scaled-row width gap %) (butlast layout))
-        (let [[row-aspect last-row]   (last layout)
-              row-height (/ height photos-per-screen)
-              row-width  (- (* row-height row-aspect)
-                            (* gap (dec (count last-row))))]
-          (if (> row-width width)
-            (->scaled-row width gap (last layout))
-            [row-height last-row]))))
+(defn fit-last-row
+  [row {:keys [width height] :as rect} gap]
+  (let [row-height (/ height photos-per-screen)
+        row-width  (+ (* row-height (row-aspect row))
+                      (* gap (dec (count row))))]
+    (if (>= row-width width)
+      (fit-row row rect gap)
+      [row-height row])))
 
-(defrecord PaintRect [id x y width height])
+(defn fit-rows
+  [rows rect gap]
+  (let [scaled (conj (mapv #(fit-row % rect gap) (butlast rows))
+        (fit-last-row (last rows) rect gap))]
+    scaled))
 
-(defn build-paint-list
-  [{:keys [width]} gap scaled-layout]
-  (let [[first-height first-row] (first scaled-layout)]
-    (loop [x              0
-           y              0
-           height         first-height
-           current-row    first-row
-           remaining-rows (rest scaled-layout)
-           paint-list     (transient [])]
-      (cond (seq current-row)
-            (let [[id {:keys [aspect]}] (first current-row)
-                  width                 (* aspect height)
-                  rect                  (PaintRect. id x y width height)]
-              (recur (+ x width gap)
+(defn scale-rows
+  "Returns a layout where each element of 'rows' is scaled to fit
+  the width of the enclosing 'rect' with 'gap' pixels between each
+  item on all sides.
+
+  The value returned implements IWillLayout and can participate in other
+  layouts."
+  [{:keys [width] :as rect} rows gap]
+  (println "scaling rows")
+  (let [scaled-rows            (fit-rows rows rect gap)
+        [[height row] & rows]  scaled-rows]
+    (loop [x          0
+           y          0
+           width      0
+           height     height
+           row        row
+           rows       rows
+           paint-list (transient [])]
+      (cond (seq row)
+            (let [[id item]  (first row)
+                  item-width (* (aspect item) height)
+                  item-end   (+ x item-width)
+                  rect       (map->PaintRect
+                               {:id     id
+                                :x      x
+                                :y      y
+                                :width  item-width
+                                :height height})]
+              (recur (+ item-end gap)
                      y
+                     (max width item-end)
                      height
-                     (rest current-row)
-                     remaining-rows
+                     (rest row)
+                     rows
                      (conj! paint-list rect)))
 
-            (seq remaining-rows)
-            (let [[row-height row] (first remaining-rows)]
-              (recur 0
-                     (+ y height gap)
-                     row-height
-                     row
-                     (rest remaining-rows)
-                     paint-list))
+            (seq rows)
+            (let [[[height' row] & rows] rows
+                  y' (+ y height gap)]
+              (recur 0 y' width height' row rows paint-list))
 
-            :default [(+ y height) (persistent! paint-list)]))))
+            :default
+            (map->Layout
+              {:rect       {:width  width :height (+ y height)}
+               :paint-list (persistent! paint-list)})))))
+
+;; subscriptions
+
+(reg-sub :layouts/metrics (fn [db [_ window-id]] (get-in db [:layouts/metrics window-id])))
+
+(reg-sub :layouts/base-rect
+         (fn [[_ window-id]] (subscribe [:layouts/metrics window-id]))
+         (fn [window _] (:base-rect window)))
+
+(reg-sub :layouts/scale-rect
+         (fn [[_ window-id]] (subscribe [:layouts/metrics window-id]))
+         (fn [window _] (:scale-rect window)))
 
 (reg-sub
-  :album-layout/paint-list;;
-  (fn [[_ items _]]
-    [(subscribe [:album-layout/window (hash items)])
-     (subscribe [:album-layout/layout items])])
-  (fn [[{:keys [box] :as window} layout] [_ _ gap]]
-    (->> layout
-         (scale-layout box gap)
-         (build-paint-list box gap))))
+  :layouts/perfect-rows
+
+  (fn [[_ window-id items]]
+    (subscribe [:layouts/base-rect window-id]))
+
+  (fn [base-rect [_ _ items]]
+    (compute-rows base-rect items)))
+
+(reg-sub
+  :layouts/perfect-layout
+
+  (fn [[_ window-id _] [items]]
+    [(subscribe [:layouts/scale-rect window-id])
+     (subscribe [:layouts/perfect-rows window-id items])])
+
+  (fn [[scale-rect rows] [_ _ gap]]
+    (scale-rows scale-rect rows gap)))
