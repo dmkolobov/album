@@ -5,7 +5,7 @@
             [day8.re-frame.async-flow-fx]
             [re-com.core]
 
-            [layout.core :refer [perfect-layout]]
+            [layout.core :refer [perfect-layout grouped-layout]]
 
             [cljs.pprint :refer [pprint]]
 
@@ -29,28 +29,22 @@
                  :on-click #(dispatch [:controls/push-view [:photo-view path]])])
 
 (defn gallery
-  [date-string]
-  (let [images (subscribe [:images/date-filter date-string])]
-    (fn [_]
-      [v-box :size     "none"
-             :gap      "1em"
-             :children [[title :label date-string
-                               :level :level3]
-                        (when @images
-                          [box :child [perfect-layout :items   images
-                                                      :gap     6.66
-                                                      :item-fn index-image]])]])))
+  [date-string layout]
+  [v-box :size     "none"
+         :gap      "1em"
+         :children [[title :label date-string
+                           :level :level3]
+                    layout]])
 
 (defn photos-content
   []
-  (let [dates (subscribe [:images/date-filters])]
+  (let [by-date (subscribe [:images/by-date])]
     (fn []
-      [v-box :size     "auto"
-             :padding  "1em 1em 1em 0"
-             :gap      "1em"
-             :children (doall (map (fn [date]
-                                     ^{:key date} [gallery date])
-                                   @dates))])))
+      [grouped-layout :groups    by-date
+                      :item-gap  5
+                      :item-fn   index-image
+                      :group-gap 50
+                      :group-fn  gallery])))
 
 (defn base-view
   [& {:keys [toolbar content]}]
@@ -61,6 +55,7 @@
                            :children [[controls/sidebar]
                                       [scroller :size       "auto"
                                                 :max-height "100%"
+                                                :padding "1em 1em 1em 0"
                                                 :child      content]]]]])
 
 (defn stacked-view

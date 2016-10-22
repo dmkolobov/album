@@ -1,6 +1,7 @@
 (ns layout.core
   (:require [goog.events]
             [reagent.core :as reagent]
+            [re-com.core :refer [v-box h-box]]
             [re-frame.core :refer [reg-sub reg-event-db subscribe dispatch dispatch-sync]]
             ;; Need to include 'subs' and 'events' explicitely for Google Closure Compiler.
             [layout.subs]
@@ -33,7 +34,7 @@
   correct absolute position and with the correct dimensions."
   [render-fn {:keys [rect paint-list] :as layout}]
   [:div
-   {:style {:width    "100%"
+   {:style {:width    (str (:width rect) "px")
             :height   (str (:height rect) "px")
             :position "relative"}}
    (doall
@@ -73,4 +74,40 @@
                         step))
        :reagent-render
        (fn [& {:keys [gap]}]
-         (paint-layout item-fn @layout))})))
+         [paint-layout item-fn @layout])})))
+
+(defn grouped-layout
+  [& {:keys [groups
+             step
+
+             item-gap
+             group-gap
+
+             group-fn
+             item-fn]
+      :or {step 100
+           item-gap 0
+           group-gap 5}}]
+  (let [window-id    (hash groups)
+        group-layout (subscribe [:layouts/grouped-layout
+                                 window-id
+                                 item-gap
+                                 group-gap]
+                                [groups])]
+    (reagent/create-class
+      {:component-did-mount
+       (fn [owner]
+         (measure-node! window-id
+                        (reagent/dom-node owner)
+                        step))
+       :reagent-render
+       (fn [_]
+         [v-box :gap      "1em"
+                :width    "100%"
+                :children (doall (map (fn [row]
+                                 [h-box :gap      (str group-gap "px")
+                                        :width    "100%"
+                                        :children (map (fn [{:keys [id] :as layout}]
+                                                         (group-fn id [paint-layout item-fn layout]))
+                                                       row)])
+                               @group-layout))])})))

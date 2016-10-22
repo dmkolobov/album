@@ -155,3 +155,48 @@
 
   (fn [[scale-rect rows] [_ _ gap]]
     (scale-rows scale-rect rows gap)))
+
+(defn clump-layouts
+  [{:keys [width] :as rect} gap layouts]
+  (loop [rows          []
+         current-row   []
+         current-width 0
+         layouts       layouts]
+    (if (seq layouts)
+      (let [[{:keys [rect] :as layout} & layouts'] layouts
+            layout-width (:width rect)]
+
+        (cond ;; layout is the same width as the container and gets its own row.
+              (= layout-width width)
+              (recur (if-let [row (seq current-row)]
+                       (conj rows row [layout])
+                       (conj rows [layout]))
+                     []
+                     0
+                     layouts')
+
+              ;; layout is smaller than the container and fits into the current row.
+              (<= (+ current-width layout-width) width)
+              (recur rows (conj current-row layout) (+ current-width layout-width gap) layouts')
+
+              ;; layout is smaller than the container, but does not fit into the current row;
+              ;; start a new row.
+              :default
+              (recur (conj rows current-row) [layout] layout-width layouts')))
+
+      (if-let [row (seq current-row)] (conj rows row) rows))))
+
+(reg-sub
+  :layouts/grouped-layout
+
+  (fn [[_ window-id _ _] [groups]]
+    (into [(subscribe [:layouts/scale-rect window-id])]
+          (map (fn [[group-id group-items]]
+                 (subscribe [:layouts/perfect-rows window-id group-items]))
+               groups)))
+
+  (fn [[scale-rect & row-groups] [_ _ item-gap group-gap] [groups]]
+    (let [layout-groups (map #(assoc %2 :id %1)
+                             (keys groups)
+                             (map #(scale-rows scale-rect % item-gap) row-groups))]
+      (clump-layouts scale-rect group-gap layout-groups))))

@@ -18,27 +18,14 @@
   [date]
   (.toDateString date))
 
-;; Returns a sequence of date strings, sorted in descending
-;; order.
-
 (reg-sub
-  :images/date-filters
+  :images/by-date
   (fn [_ _]
     (subscribe [:loaded-images]))
-  (fn [images _]
+  (fn [images]
     (->> images
-         (map (comp :taken-at second))
-         (sort)
-         (map date-string)
-         (into (list))
-         (distinct))))
-
-(reg-sub
-  :images/date-filter
-  (fn [_ _]
-    (subscribe [:loaded-images]))
-  (fn [images [_ date]]
-    (filter #(= date (date-string (:taken-at (second %)))) images)))
+         (group-by (comp date-string :taken-at second))
+         (into (sorted-map)))))
 
 (reg-sub
   :preloaded?
