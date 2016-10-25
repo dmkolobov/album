@@ -38,4 +38,4 @@
   :images/carousel-cursor
   (fn [db _]
     (let [{:keys [items idx]} (get db :images/carousel-state)]
-      (second (nth items idx)))))
+      (nth items idx))))

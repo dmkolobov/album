@@ -47,35 +47,6 @@
                                       :content  toolbar-content]
                     content]])
 
-(reg-event-fx
-  :images/open-carousel
-  [trim-v]
-  (fn [{:keys [db] :as cofx} [idx carousel]]
-    (let [state {:items carousel :idx idx}]
-      {:db       (assoc db :images/carousel-state state)
-       :dispatch [:controls/push-view [:carousel-view]]})))
-
-(reg-event-fx
-  :images/close-carousel
-  [trim-v]
-  (fn [{:keys [db] :as cofx}]
-    {:db       (dissoc db :images/carousel-state)
-     :dispatch [:controls/pop-view]}))
-
-(reg-event-db
-  :images/advance-carousel
-  (fn [db _]
-    (update-in db
-               [:images/carousel-state :idx]
-               inc)))
-
-(reg-event-db
-  :images/rewind-carousel
-  (fn [db _]
-    (update-in db
-               [:images/carousel-state :idx]
-               dec)))
-
 (defn carousel-view
   "Display stored photo sequence in a full-screen carousel view."
   []
@@ -84,20 +55,18 @@
         on-advance #(dispatch [:images/advance-carousel])
         on-close   #(dispatch [:images/close-carousel])]
     (fn []
-      [stacked-view :on-close on-close
-                    :content  [carousel :model      cursor
-                                        :on-rewind  on-rewind
-                                        :on-advance on-advance
-                                        :render-fn  (fn [path] [images/render :path path])]])))
-
-(defn index-image-handler
-  [carousel-idx carousel _]
-  (dispatch [:images/open-carousel carousel-idx carousel]))
+      [stacked-view :on-close      on-close
+                    :toolbar-right [label :label "foobar"]
+                    :content       [carousel :model      cursor
+                                             :on-rewind  on-rewind
+                                             :on-advance on-advance
+                                             :render-fn  (fn [path]
+                                                           [images/render :path path])]])))
 
 (defn index-image
-  [path carousel-idx carousel]
-  [images/render :path     path
-                 :on-click (partial index-image-handler carousel-idx carousel)])
+  [path idx items]
+  (let [on-click #(dispatch [:images/open-carousel idx items])]
+    [images/render :path path :on-click on-click]))
 
 (def MONTHS
   ["January"

@@ -84,10 +84,6 @@
         (fit-last-row (last rows) rect gap))]
     scaled))
 
-(defn ->carousel
-  [paint-list]
-  (partition 3 1 [nil] (concat [nil] (map :id paint-list))))
-
 (defn scale-rows
   "Returns a layout where each element of 'rows' is scaled to fit
   the width of the enclosing 'rect' with 'gap' pixels between each
@@ -134,8 +130,7 @@
                   height     (+ y height)]
               (map->Layout
               {:rect       {:width  width :height height}
-               :paint-list paint-list
-               :carousel   (->carousel paint-list)}))))))
+               :paint-list paint-list}))))))
 
 ;; subscriptions
 

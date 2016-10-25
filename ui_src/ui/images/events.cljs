@@ -122,3 +122,30 @@
   :start-import
   (constantly
     {:main-thread/open-files {:on-open [:import-images]}}))
+
+;; carousels
+
+(reg-event-fx
+  :images/open-carousel
+  [trim-v]
+  (fn [{:keys [db] :as cofx} [idx items]]
+    (let [state {:items items :idx idx}]
+      {:db       (assoc db :images/carousel-state state)
+       :dispatch [:controls/push-view [:carousel-view]]})))
+
+(reg-event-fx
+  :images/close-carousel
+  [trim-v]
+  (fn [{:keys [db] :as cofx}]
+    {:db       (dissoc db :images/carousel-state)
+     :dispatch [:controls/pop-view]}))
+
+(reg-event-db
+  :images/advance-carousel
+  (fn [db _]
+    (update-in db [:images/carousel-state :idx] inc)))
+
+(reg-event-db
+  :images/rewind-carousel
+  (fn [db _]
+    (update-in db [:images/carousel-state :idx] dec)))

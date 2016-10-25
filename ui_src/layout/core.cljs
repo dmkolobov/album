@@ -31,22 +31,23 @@
 (defn paint-layout
   "Given a paint list and an item render-fn, render each item in its
   correct absolute position and with the correct dimensions."
-  [render-fn {:keys [rect paint-list carousel] :as layout}]
-  [:div
-   {:style {:width    (str (:width rect) "px")
-            :height   (str (:height rect) "px")
-            :position "relative"}}
-   (doall
-     (map-indexed (fn [item-idx {:keys [x y width height id]}]
-                    ^{:key (str id)}
-                    [:div
-                     {:style {:position "absolute"
-                              :left     x
-                              :top      y
-                              :width    width
-                              :height   height}}
-                     [render-fn id item-idx carousel]])
-                  paint-list))])
+  [render-fn {:keys [rect paint-list] :as layout}]
+  (let [item-ids (map :id paint-list)]
+    [:div
+     {:style {:width    (str (:width rect) "px")
+              :height   (str (:height rect) "px")
+              :position "relative"}}
+     (doall
+       (map-indexed (fn [item-idx {:keys [x y width height id]}]
+                      ^{:key (str id)}
+                      [:div
+                       {:style {:position "absolute"
+                                :left     x
+                                :top      y
+                                :width    width
+                                :height   height}}
+                       [render-fn id item-idx item-ids]])
+                    paint-list))]))
 
 (defn measure-node!
   [window-id node step]
