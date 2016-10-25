@@ -14,9 +14,12 @@
               (and (some? aspect) (some? taken-at)))
             image-metrics)))
 
-(defn date-string
+(defn date->day
   [date]
-  (.toDateString date))
+  (let [year  (.getFullYear date)
+        month (.getMonth date)
+        day   (.getDay date)]
+    (js/Date. year month day)))
 
 (reg-sub
   :images/by-date
@@ -24,8 +27,8 @@
     (subscribe [:loaded-images]))
   (fn [images]
     (->> images
-         (group-by (comp date-string :taken-at second))
-         (into (sorted-map)))))
+         (group-by (comp date->day :taken-at second))
+         (into (sorted-map-by >)))))
 
 (reg-sub
   :preloaded?

@@ -28,11 +28,32 @@
   [images/render :path     path
                  :on-click #(dispatch [:controls/push-view [:photo-view path]])])
 
+(def MONTHS
+  ["January"
+   "February"
+   "March"
+   "April"
+   "May"
+   "June"
+   "July"
+   "August"
+   "September"
+   "October"
+   "November"
+   "December"])
+
+(defn date-string
+  [date]
+  (let [year  (.getFullYear date)
+        month (get MONTHS (.getMonth date))
+        day   (.getDay date)]
+    (str month " " day ", " year)))
+
 (defn gallery
-  [date-string layout]
+  [date layout]
   [v-box :size     "none"
          :gap      "1em"
-         :children [[title :label date-string
+         :children [[title :label (date-string date)
                            :level :level3]
                     layout]])
 
