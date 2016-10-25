@@ -1,7 +1,7 @@
 (ns ui.core
   (:require [reagent.core :as reagent :refer [atom]]
             [re-frame.core :refer [reg-event-fx reg-fx trim-v reg-event-db reg-sub dispatch subscribe]]
-            [re-com.core :refer [h-box v-box box throbber title label button scroller h-split]]
+            [re-com.core :refer [md-circle-icon-button h-box v-box box throbber title label button scroller h-split]]
             [day8.re-frame.async-flow-fx]
             [re-com.core]
 
@@ -19,14 +19,85 @@
             
             [ui.controls.views :as controls]
             [ui.controls.events]
-            [ui.controls.subs]))
+            [ui.controls.subs]
+
+            [ui.views.carousel :refer [carousel]]))
 
 (enable-console-print!)
 
+(defn base-view
+  [& {:keys [toolbar content]}]
+  [v-box :size       "auto"
+   :max-height "100%"
+   :children [toolbar
+              [h-box :size     "auto"
+               :children [[controls/sidebar]
+                          [scroller :size       "auto"
+                           :max-height "100%"
+                           :padding "1em 1em 1em 0"
+                           :child      content]]]]])
+
+(defn stacked-view
+  [& {:keys [toolbar-content content on-close]}]
+  [v-box :size     "auto"
+         :height   "100%"
+         :children [[controls/toolbar :icon     "zmdi-arrow-left"
+                                      :tooltip  "Close"
+                                      :on-click on-close
+                                      :content  toolbar-content]
+                    content]])
+
+(reg-event-fx
+  :images/open-carousel
+  [trim-v]
+  (fn [{:keys [db] :as cofx} [idx carousel]]
+    (let [state {:items carousel :idx idx}]
+      {:db       (assoc db :images/carousel-state state)
+       :dispatch [:controls/push-view [:carousel-view]]})))
+
+(reg-event-fx
+  :images/close-carousel
+  [trim-v]
+  (fn [{:keys [db] :as cofx}]
+    {:db       (dissoc db :images/carousel-state)
+     :dispatch [:controls/pop-view]}))
+
+(reg-event-db
+  :images/advance-carousel
+  (fn [db _]
+    (update-in db
+               [:images/carousel-state :idx]
+               inc)))
+
+(reg-event-db
+  :images/rewind-carousel
+  (fn [db _]
+    (update-in db
+               [:images/carousel-state :idx]
+               dec)))
+
+(defn carousel-view
+  "Display stored photo sequence in a full-screen carousel view."
+  []
+  (let [cursor     (subscribe [:images/carousel-cursor]) ;; returns the current item.
+        on-rewind  #(dispatch [:images/rewind-carousel])
+        on-advance #(dispatch [:images/advance-carousel])
+        on-close   #(dispatch [:images/close-carousel])]
+    (fn []
+      [stacked-view :on-close on-close
+                    :content  [carousel :model      cursor
+                                        :on-rewind  on-rewind
+                                        :on-advance on-advance
+                                        :render-fn  (fn [path] [images/render :path path])]])))
+
+(defn index-image-handler
+  [carousel-idx carousel _]
+  (dispatch [:images/open-carousel carousel-idx carousel]))
+
 (defn index-image
-  [path]
+  [path carousel-idx carousel]
   [images/render :path     path
-                 :on-click #(dispatch [:controls/push-view [:photo-view path]])])
+                 :on-click (partial index-image-handler carousel-idx carousel)])
 
 (def MONTHS
   ["January"
@@ -46,7 +117,7 @@
   [date]
   (let [year  (.getFullYear date)
         month (get MONTHS (.getMonth date))
-        day   (.getDay date)]
+        day   (.getDate date)]
     (str month " " day ", " year)))
 
 (defn gallery
@@ -67,37 +138,6 @@
                       :group-gap 50
                       :group-fn  gallery])))
 
-(defn base-view
-  [& {:keys [toolbar content]}]
-  [v-box :size       "auto"
-         :max-height "100%"
-         :children [toolbar
-                    [h-box :size     "auto"
-                           :children [[controls/sidebar]
-                                      [scroller :size       "auto"
-                                                :max-height "100%"
-                                                :padding "1em 1em 1em 0"
-                                                :child      content]]]]])
-
-(defn stacked-view
-  [& {:keys [toolbar-content content]}]
-  [v-box :size     "auto"
-         :height   "100%"
-         :children [[controls/toolbar :icon     "zmdi-arrow-left"
-                                      :tooltip  "Close"
-                                      :on-click #(dispatch [:controls/pop-view])
-                                      :content  toolbar-content]
-                    content]])
-
-(defn photo-view
-  [path]
-  [stacked-view :content [box :size       "auto"
-                              :height     "100%"
-                              :padding    "1em"
-                              :align-self :center
-                              :align      :center
-                              :child      [images/render :path path]]])
-
 (defn photos-view
   []
   [base-view :toolbar [controls/main-toolbar :title "Photos"]
@@ -109,9 +149,9 @@
              :content [:div "Coming soon..."]])
 
 (def views
-  {:photo-view  photo-view
-   :photos-view photos-view
-   :albums-view albums-view})
+  {:photos-view   photos-view
+   :albums-view   albums-view
+   :carousel-view carousel-view})
 
 (defn root-component
   []

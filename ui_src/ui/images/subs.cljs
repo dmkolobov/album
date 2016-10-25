@@ -18,7 +18,7 @@
   [date]
   (let [year  (.getFullYear date)
         month (.getMonth date)
-        day   (.getDay date)]
+        day   (.getDate date)]
     (js/Date. year month day)))
 
 (reg-sub
@@ -33,3 +33,9 @@
 (reg-sub
   :preloaded?
   (fn [db [_ path]] (get-in db [:preloaded? path])))
+
+(reg-sub
+  :images/carousel-cursor
+  (fn [db _]
+    (let [{:keys [items idx]} (get db :images/carousel-state)]
+      (second (nth items idx)))))

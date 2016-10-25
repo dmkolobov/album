@@ -9,7 +9,7 @@
       (let [item (first (get @cache k))]
         (swap! cache update k rest)
         item))))
-;;
+
 (def photos-per-screen 3.5)
 
 (defonce linear-partition (js/require "linear-partitioning"))
@@ -27,6 +27,9 @@
 (defn item-weight [item] (* 100 (aspect (second item))))
 
 (defn compute-partitions
+  "Partition the provided items into 'n' rows, where 'n' depends on
+  'photos-per-screen', and each row has an approximately equal sum of
+  aspect ratios."
   [rect items]
   (let [aspects (map (comp aspect second) items)
         n       (num-rows rect aspects)]
@@ -65,6 +68,8 @@
    row])
 
 (defn fit-last-row
+  "Returns a vector [row-height row], where that `row-height` is defined
+  so that the width of the row fills the provided `rect`."
   [row {:keys [width height] :as rect} gap]
   (let [row-height (/ height photos-per-screen)
         row-width  (+ (* row-height (row-aspect row))
@@ -78,6 +83,10 @@
   (let [scaled (conj (mapv #(fit-row % rect gap) (butlast rows))
         (fit-last-row (last rows) rect gap))]
     scaled))
+
+(defn ->carousel
+  [paint-list]
+  (partition 3 1 [nil] (concat [nil] (map :id paint-list))))
 
 (defn scale-rows
   "Returns a layout where each element of 'rows' is scaled to fit
@@ -121,9 +130,12 @@
               (recur 0 y' width height' row rows paint-list))
 
             :default
-            (map->Layout
-              {:rect       {:width  width :height (+ y height)}
-               :paint-list (persistent! paint-list)})))))
+            (let [paint-list (persistent! paint-list)
+                  height     (+ y height)]
+              (map->Layout
+              {:rect       {:width  width :height height}
+               :paint-list paint-list
+               :carousel   (->carousel paint-list)}))))))
 
 ;; subscriptions
 

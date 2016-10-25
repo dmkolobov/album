@@ -23,30 +23,30 @@
            (.-innerHeight js/window))))
 
 (defn resize-handler
+  "Creates a function which will update the layout window rects with
+  measurements from 'node' whenever the window resizes."
   [layout-id node step]
-  #(dispatch [:layouts/update-metrics
-              layout-id
-              (node-dimensions node)
-              step]))
+  #(dispatch [:layouts/update-metrics layout-id (node-dimensions node) step]))
 
 (defn paint-layout
   "Given a paint list and an item render-fn, render each item in its
   correct absolute position and with the correct dimensions."
-  [render-fn {:keys [rect paint-list] :as layout}]
+  [render-fn {:keys [rect paint-list carousel] :as layout}]
   [:div
    {:style {:width    (str (:width rect) "px")
             :height   (str (:height rect) "px")
             :position "relative"}}
    (doall
-     (for [{:keys [x y width height id]} paint-list]
-       ^{:key (str id)}
-       [:div
-        {:style {:position "absolute"
-                 :left     x
-                 :top      y
-                 :width    width
-                 :height   height}}
-        [render-fn id]]))])
+     (map-indexed (fn [item-idx {:keys [x y width height id]}]
+                    ^{:key (str id)}
+                    [:div
+                     {:style {:position "absolute"
+                              :left     x
+                              :top      y
+                              :width    width
+                              :height   height}}
+                     [render-fn id item-idx carousel]])
+                  paint-list))])
 
 (defn measure-node!
   [window-id node step]
