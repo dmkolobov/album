@@ -157,6 +157,9 @@
     (scale-rows scale-rect rows gap)))
 
 (defn clump-layouts
+  "Takes a window rect, an integer gap, and a sequence of layouts
+  as inputs and returns a sequence of layout rows, so that thin layouts
+  are displayed on the same row."
   [{:keys [width] :as rect} gap layouts]
   (loop [rows          []
          current-row   []
