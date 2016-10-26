@@ -25,17 +25,17 @@
 
 (enable-console-print!)
 
-(defn base-view
+(defn main-view
   [& {:keys [toolbar content]}]
   [v-box :size       "auto"
-   :max-height "100%"
-   :children [toolbar
-              [h-box :size     "auto"
-               :children [[controls/sidebar]
-                          [scroller :size       "auto"
-                           :max-height "100%"
-                           :padding "1em 1em 1em 0"
-                           :child      content]]]]])
+         ;;:max-height "100%"
+         :children [toolbar
+                    [h-box :size     "auto"
+                     :children [[controls/sidebar]
+                                [scroller :size       "auto"
+                                          :max-height "100%"
+                                          :padding    "0 1em 1em 0"
+                                          :child      content]]]]])
 
 (defn stacked-view
   [& {:keys [toolbar-content content on-close]}]
@@ -50,7 +50,7 @@
 (defn carousel-view
   "Display stored photo sequence in a full-screen carousel view."
   []
-  (let [cursor     (subscribe [:images/carousel-cursor]) ;; returns the current item.
+  (let [cursor     (subscribe [:images/carousel-cursor])
         on-rewind  #(dispatch [:images/rewind-carousel])
         on-advance #(dispatch [:images/advance-carousel])
         on-close   #(dispatch [:images/close-carousel])]
@@ -97,7 +97,7 @@
                            :level :level3]
                     layout]])
 
-(defn photos-content
+(defn photo-gallery
   []
   (let [by-date (subscribe [:images/by-date])]
     (fn []
@@ -108,13 +108,15 @@
                       :group-fn  gallery])))
 
 (defn photos-view
+  "Display a gallery of all photos in your Album library."
   []
-  [base-view :toolbar [controls/main-toolbar :title "Photos"]
-             :content [photos-content]])
+  [main-view :toolbar [controls/main-toolbar :title "Photos"]
+             :content [photo-gallery]])
 
 (defn albums-view
+  "Display a gallery of all albums in your Album library."
   []
-  [base-view :toolbar [controls/main-toolbar :title "Albums"]
+  [main-view :toolbar [controls/main-toolbar :title "Albums"]
              :content [:div "Coming soon..."]])
 
 (def views
