@@ -20,3 +20,15 @@
   :controls/pop-view
   (fn [db _]
     (update db :controls/view-stack pop)))
+
+;; ---- sidebars ----
+
+(reg-event-db
+  :controls/open-left-sidebar
+  (fn [db _]
+    (assoc db :controls/sidebar-left? true)))
+
+(reg-event-db
+  :controls/close-left-sidebar
+  (fn [db _]
+    (dissoc db :controls/sidebar-left?)))

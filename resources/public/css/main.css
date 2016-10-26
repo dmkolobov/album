@@ -7,14 +7,26 @@ html, body, #app-container {
 }
 
 body {
-  background: #EEEEEE;
+  background: #fff;
 }
 
 /* ---- controls ---- */
 
+.toolbar, .sidebar {
+  box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+}
+
 .toolbar {
   z-index:    1000;
-  box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+}
+
+.left-sidebar {
+  position:   fixed;
+  top:        0;
+  left:       0;
+  height:     100%;
+  background: #fff;
+  z-index:    2000;
 }
 
 /* ---- images ---- */

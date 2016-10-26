@@ -28,13 +28,12 @@
 (defn main-view
   [& {:keys [toolbar content]}]
   [v-box :size       "auto"
-         ;;:max-height "100%"
          :children [toolbar
                     [h-box :size     "auto"
                      :children [[controls/sidebar]
                                 [scroller :size       "auto"
                                           :max-height "100%"
-                                          :padding    "0 1em 1em 0"
+                                          :padding    "1em 1em 1em 0"
                                           :child      content]]]]])
 
 (defn stacked-view
