@@ -36,6 +36,16 @@
   [["Photos" [photos-button]]
    ["Albums" [albums-button]]])
 
+(defn sidebar-logo
+  []
+  [box :child [hyperlink :on-click #(dispatch [:controls/close-left-sidebar])
+                         :label    [box :align   :center
+                                        :padding "1em 2em"
+                                        :child   [title :level         :level2
+                                                        :margin-top    "0px"
+                                                        :margin-bottom "0px"
+                                                        :label         "album"]]]])
+
 (defn sidebar
   []
   (let [sidebar? (subscribe [:controls/sidebar-left?])]
@@ -43,14 +53,8 @@
      [h-box :children [(when @sidebar?
                          [v-box :size     "auto"
                                 :class    "sidebar left-sidebar"
-                                :children [[box :child [hyperlink :label    [box :align   :center
-                                                                                 :padding "1em 2em"
-                                                                                 :child   [title :level         :level2
-                                                                                                 :margin-top    "0px"
-                                                                                                 :margin-bottom "0px"
-                                                                                                 :label         "album"]]
-                                                                  :on-click #(dispatch [:controls/close-left-sidebar])]]
-                                           [v-box :padding  "2em"
+                                :children [[sidebar-logo]
+                                           [v-box :padding  "2em 1em"
                                                   :gap      "1em"
                                                   :children (map (fn [[label button]]
                                                                    [h-box :gap      "2em"
@@ -63,16 +67,21 @@
                                                                  sidebar-actions)]]])
                        [v-box :size     "none"
                               :align    :center
-                              :padding  "2em"
+                              :padding  "2em 1em"
                               :gap      "1em"
-                              :children (map second sidebar-actions)]]])))
+                              :children (map (fn [[label button]]
+                                               [v-box :align    :center
+                                                      :gap      "0.5em"
+                                                      :children [button
+                                                                 [re-com/label :label label :class "sidebar-label"]]])
+                                             sidebar-actions)]]])))
 
 (defn toolbar
   [& {:keys [icon tooltip on-click content class]}]
   [h-box :class    (str "toolbar " class)
          :size     "none"
          :gap      "2em"
-         :padding  "1em 2em"
+         :padding  "1em 1.5em"
          :align    :baseline
          :children [[md-icon-button :md-icon-name     icon
                                     :size             :regular

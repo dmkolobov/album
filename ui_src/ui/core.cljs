@@ -27,14 +27,15 @@
 
 (defn main-view
   [& {:keys [toolbar content]}]
-  [v-box :size       "auto"
+  [v-box :size     "100%"
+         :height   "100%"
          :children [toolbar
                     [h-box :size     "auto"
-                     :children [[controls/sidebar]
-                                [scroller :size       "auto"
-                                          :max-height "100%"
-                                          :padding    "1em 1em 1em 0"
-                                          :child      content]]]]])
+                           :children [[controls/sidebar]
+                                      [scroller :size       "100%"
+                                                :padding    "1em 1em 1em 0"
+                                                :v-scroll   :auto
+                                                :child      content]]]]])
 
 (defn stacked-view
   [& {:keys [toolbar-content content on-close]}]
@@ -52,15 +53,15 @@
   (let [cursor     (subscribe [:images/carousel-cursor])
         on-rewind  #(dispatch [:images/rewind-carousel])
         on-advance #(dispatch [:images/advance-carousel])
-        on-close   #(dispatch [:images/close-carousel])]
+        on-close   #(dispatch [:images/close-carousel])
+        render-fn  (fn [path] [images/render :path path])]
     (fn []
-      [stacked-view :on-close      on-close
-                    :toolbar-right [label :label "foobar"]
-                    :content       [carousel :model      cursor
-                                             :on-rewind  on-rewind
-                                             :on-advance on-advance
-                                             :render-fn  (fn [path]
-                                                           [images/render :path path])]])))
+      [stacked-view :on-close on-close
+                    :actions  [label :label "foobar"]
+                    :content  [carousel :model      cursor
+                                        :on-rewind  on-rewind
+                                        :on-advance on-advance
+                                        :render-fn  render-fn]])))
 
 (defn index-image
   [path idx items]
@@ -94,7 +95,8 @@
          :gap      "1em"
          :children [[title :label (date-string date)
                            :level :level3]
-                    layout]])
+                    [box :size  "auto"
+                         :child layout]]])
 
 (defn photo-gallery
   []
@@ -110,7 +112,9 @@
   "Display a gallery of all photos in your Album library."
   []
   [main-view :toolbar [controls/main-toolbar :title "Photos"]
-             :content [photo-gallery]])
+             :content ;;[box :size    "100%"
+                      ;;     :padding "1em 1.5em 1em 0"
+                      [photo-gallery]])
 
 (defn albums-view
   "Display a gallery of all albums in your Album library."

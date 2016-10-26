@@ -129,7 +129,7 @@
             (let [paint-list (persistent! paint-list)
                   height     (+ y height)]
               (map->Layout
-              {:rect       {:width  width :height height}
+              {:rect       {:width width :height height}
                :paint-list paint-list}))))))
 
 ;; subscriptions
@@ -177,7 +177,7 @@
             layout-width (:width rect)]
 
         (cond ;; layout is the same width as the container and gets its own row.
-              (= layout-width width)
+              (< (.abs js/Math (- layout-width width)) gap)
               (recur (if-let [row (seq current-row)]
                        (conj rows row [layout])
                        (conj rows [layout]))

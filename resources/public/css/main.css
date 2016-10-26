@@ -29,6 +29,11 @@ body {
   z-index:    2000;
 }
 
+.sidebar-label {
+  font-size: 0.8em;
+  color: #aaa;
+}
+
 /* ---- images ---- */
 
 .image {

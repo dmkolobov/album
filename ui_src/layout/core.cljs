@@ -103,12 +103,25 @@
                         step))
        :reagent-render
        (fn [_]
-         [v-box :gap      "1em"
+         [v-box :class    "grouped-perfect-layout"
+                :gap      "1em"
+                :size     "auto"
                 :width    "100%"
-                :children (doall (map (fn [row]
-                                 [h-box :gap      (str group-gap "px")
-                                        :width    "100%"
-                                        :children (map (fn [{:keys [id] :as layout}]
-                                                         (group-fn id [paint-layout item-fn layout]))
-                                                       row)])
-                               @group-layout))])})))
+                :children (doall
+                            (map (fn [row]
+                                   (cond (= 0 (count row))
+                                         (println "blank row!")
+
+                                         (= 1 (count row))
+                                         [group-fn (:id (first row)) [paint-layout item-fn (first row)]]
+
+                                         :default [h-box :gap      (str group-gap "px")
+                                                         :size     "none"
+                                                         :width    "100%"
+                                                         :margin   (if (= row (last @group-layout))
+                                                                     "0 0 1em 0"
+                                                                     "0px")
+                                                         :children (map (fn [{:keys [id] :as layout}]
+                                                                          [group-fn id [paint-layout item-fn layout]])
+                                                                        row)]))
+                                 @group-layout))])})))
