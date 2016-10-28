@@ -1,5 +1,6 @@
 (ns ui.controls.views
   (:require [re-frame.core :refer [subscribe dispatch]]
+            [reagent.core :as reagent]
             [re-com.core :as re-com :refer [md-icon-button hyperlink title v-box box h-box]]))
 
 (defn import-button
@@ -46,25 +47,36 @@
                                                         :margin-bottom "0px"
                                                         :label         "album"]]]])
 
+(def transition-group
+  (reagent/adapt-react-class js/React.addons.CSSTransitionGroup))
+
+(defn expanded-sidebar
+  []
+  [v-box :size     "auto"
+         :class    "sidebar left-sidebar"
+         :children [[sidebar-logo]
+                    [v-box :padding  "2em 1em"
+                           :gap      "1em"
+                           :children (map (fn [[label button]]
+                                            [h-box :gap      "2em"
+                                                   :align    :center
+                                                   :children [[box :size "none" :child button]
+                                                              [title :level :level4
+                                                               :label label
+                                                               :margin-top    "0px"
+                                                               :margin-bottom "0px"]]])
+                                                sidebar-actions)]]])
+
 (defn sidebar
   []
   (let [sidebar? (subscribe [:controls/sidebar-left?])]
     (fn []
-     [h-box :children [(when @sidebar?
-                         [v-box :size     "auto"
-                                :class    "sidebar left-sidebar"
-                                :children [[sidebar-logo]
-                                           [v-box :padding  "2em 1em"
-                                                  :gap      "1em"
-                                                  :children (map (fn [[label button]]
-                                                                   [h-box :gap      "2em"
-                                                                          :align    :center
-                                                                          :children [[box :size "none" :child button]
-                                                                                     [title :level :level4
-                                                                                            :label label
-                                                                                            :margin-top    "0px"
-                                                                                            :margin-bottom "0px"]]])
-                                                                 sidebar-actions)]]])
+     [h-box :children [[transition-group
+                          {:transition-name           "sidebar"
+                           :transition-enter-timeout  100
+                           :transition-leave-timeout  100}
+                        (when @sidebar?
+                          ^{:key "sidebar"} [expanded-sidebar])]
                        [v-box :size     "none"
                               :align    :center
                               :padding  "2em 1em"
