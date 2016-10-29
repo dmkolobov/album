@@ -131,7 +131,7 @@
   (fn [{:keys [db] :as cofx} [idx items]]
     (let [state {:items items :idx idx}]
       {:db       (assoc db :images/carousel-state state)
-       :dispatch [:controls/push-view [:carousel-view]]})))
+       :dispatch [:controls/push-view :carousel-view]})))
 
 (reg-event-fx
   :images/close-carousel

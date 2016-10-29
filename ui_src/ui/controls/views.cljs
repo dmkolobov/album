@@ -1,6 +1,7 @@
 (ns ui.controls.views
   (:require [re-frame.core :refer [subscribe dispatch]]
             [reagent.core :as reagent]
+            [ui.views.common.menu :refer [menu]]
             [re-com.core :as re-com :refer [md-icon-button hyperlink title v-box box h-box]]))
 
 (defn import-button
@@ -10,32 +11,6 @@
                   :tooltip          "Import photos"
                   :tooltip-position :below-center
                   :on-click         #(dispatch [:start-import])])
-
-(defn photos-button
-  []
-  (let [current-view (subscribe [:controls/current-view])]
-    (fn []
-      [md-icon-button :md-icon-name     "zmdi-image"
-                      :size             :regular
-                      :tooltip          "Photos"
-                      :tooltip-position :right-center
-                      :emphasise?       (= [:photos-view] @current-view)
-                      :on-click         #(dispatch [:controls/set-view [:photos-view]])])))
-
-(defn albums-button
-  []
-  (let [current-view (subscribe [:controls/current-view])]
-    (fn []
-      [md-icon-button :md-icon-name     "zmdi-collection-image"
-                      :size             :regular
-                      :tooltip          "Albums"
-                      :tooltip-position :right-center
-                      :emphasise?       (= [:albums-view] @current-view)
-                      :on-click         #(dispatch [:controls/set-view [:albums-view]])])))
-
-(def sidebar-actions
-  [["Photos" [photos-button]]
-   ["Albums" [albums-button]]])
 
 (defn sidebar-logo
   []
@@ -50,44 +25,49 @@
 (def transition-group
   (reagent/adapt-react-class js/React.addons.CSSTransitionGroup))
 
-(defn expanded-sidebar
-  []
-  [v-box :size     "auto"
-         :class    "sidebar left-sidebar"
-         :children [[sidebar-logo]
-                    [v-box :padding  "2em 1em"
-                           :gap      "1em"
-                           :children (map (fn [[label button]]
-                                            [h-box :gap      "2em"
-                                                   :align    :center
-                                                   :children [[box :size "none" :child button]
-                                                              [title :level :level4
-                                                               :label label
-                                                               :margin-top    "0px"
-                                                               :margin-bottom "0px"]]])
-                                                sidebar-actions)]]])
+(def sidebar-items
+  [{:id :photos-view :label "Photos" :icon "zmdi-image"}
+   {:id :albums-view :label "Albums" :icon "zmdi-collection-image"}])
+
+(defn label-expanded-sidebar-item
+  [{:keys [label icon]}]
+  [h-box :align    :center
+         :gap      "1em"
+         :children [[box :child [:i.sidebar-icon {:class (str "zmdi " icon)}]]
+                    [re-com/label :label label]]])
+
+(defn label-sidebar-item
+  [{:keys [label icon]}]
+  [v-box :align    :center
+         :gap      "0.25em"
+         :children [[box :child [:i.sidebar-icon.sidebar-icon-gray {:class (str "zmdi " icon)}]]
+                    [re-com/label :class "sidebar-label" :label label]]])
 
 (defn sidebar
   []
-  (let [sidebar? (subscribe [:controls/sidebar-left?])]
+  (let [current-view (subscribe [:controls/current-view])
+        sidebar?     (subscribe [:controls/sidebar-left?])
+        swap-view    #(dispatch [:controls/set-view %])]
     (fn []
-     [h-box :children [[transition-group
+     [h-box :padding "1em 0"
+            :children [[transition-group
                           {:transition-name           "sidebar"
                            :transition-enter-timeout  100
                            :transition-leave-timeout  100}
                         (when @sidebar?
-                          ^{:key "sidebar"} [expanded-sidebar])]
-                       [v-box :size     "none"
-                              :align    :center
-                              :padding  "2em 1em"
-                              :gap      "1em"
-                              :children (map (fn [[label button]]
-                                               [v-box :align    :center
-                                                      :gap      "0.5em"
-                                                      :children [button
-                                                                 [re-com/label :label label :class "sidebar-label"]]])
-                                             sidebar-actions)]]])))
-
+                          ^{:key "sidebar"}
+                          [v-box :size     "auto"
+                                 :class    "sidebar left-sidebar"
+                                 :children [[sidebar-logo]
+                                            [box :child [menu :model     current-view
+                                                              :items     sidebar-items
+                                                              :label-fn  label-expanded-sidebar-item
+                                                              :on-change swap-view]]]])]
+                       [menu :model     current-view
+                             :items     sidebar-items
+                             :label-fn  label-sidebar-item
+                             :class     "collapsed"
+                             :on-change swap-view]]])))
 (defn toolbar
   [& {:keys [icon tooltip on-click content class]}]
   [h-box :class    (str "toolbar " class)

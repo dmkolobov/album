@@ -4,17 +4,17 @@
 (reg-event-db
   :controls/set-view
   [trim-v]
-  (fn [db [view-vec]]
-    (assoc db :controls/view-stack [view-vec])))
+  (fn [db [view-id]]
+    (assoc db :controls/view-stack [view-id])))
 
 (reg-event-db
   :controls/push-view
   [trim-v]
-  (fn [db [view-vec]]
+  (fn [db [view-id]]
     (update db
             :controls/view-stack
             (fn [s]
-              (if s (conj s view-vec) [[:photos-view] view-vec])))))
+              (if s (conj s view-id) [:photos-view view-id])))))
 
 (reg-event-db
   :controls/pop-view

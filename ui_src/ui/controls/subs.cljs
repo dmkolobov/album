@@ -5,7 +5,7 @@
   :controls/current-view
   (fn [db]
     (peek
-      (get db :controls/view-stack [[:photos-view]]))))
+      (get db :controls/view-stack [:photos-view]))))
 
 (reg-sub
   :controls/sidebar-left?

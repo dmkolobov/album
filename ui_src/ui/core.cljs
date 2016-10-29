@@ -131,9 +131,8 @@
   []
   (let [current-view (subscribe [:controls/current-view])]
     (fn []
-      (let [[view-id & args] @current-view]
-        (into [(get views view-id)]
-              args)))))
+      (println @current-view)
+      [(get views @current-view)])))
 
 (reagent/render
   [root-component]
