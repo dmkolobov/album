@@ -31,7 +31,7 @@
          (into (sorted-map-by >)))))
 
 (reg-sub
-  :preloaded?
+  :images/preloaded?
   (fn [db [_ path]] (get-in db [:preloaded? path])))
 
 (reg-sub

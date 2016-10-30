@@ -25,62 +25,10 @@
             [ui.controls.events]
             [ui.controls.subs]
 
-            [ui.views.carousel :refer [carousel]]))
+            [ui.views.carousel :refer [carousel]]
+            [ui.views.info :refer [display-info info-button]]))
 
 (enable-console-print!)
-
-(defn info-button
-  []
-  [md-icon-button :md-icon-name     "zmdi-info"
-                  :size             :regular
-                  :tooltip          "Info"
-                  :tooltip-position :below-left
-                  :on-click         #(dispatch [:images/open-info])])
-
-(defn scaled-photo
-  [path {:keys [aspect]}]
-    (cond ;; square
-          (= aspect 1)
-          [:div {:display        "block"
-                 :position       "relative"
-                 :width          "0"
-                 :height         "100%"
-                 :padding-left   (str (* (/ 1 aspect) 100) "%")
-                 :margin         "auto"}
-           [images/render :path path :absolute? true]]
-
-          ;; landscape
-          (> aspect 1)
-          [box :size "100%"
-               :height "100%"
-               :align  :center
-               :child [images/render :path path :absolute? true]]
-
-          ;; portrait
-          (< aspect 1)
-          [:div {:display        "block"
-                 :position       "relative"
-                 :width          "0"
-                 :height         "100%"
-                 :padding-left    (str (* aspect 100) "%")
-                 :margin         "auto"}
-           [images/render :path path :absolute? true]]))
-
-(defn display-info
-  [model]
-  (let [[path info]  @model
-        printed-info (with-out-str (pprint info))]
-    ^{:key path}
-    [v-box :class    "fullscreen-sidebar"
-           :height   "100%"
-           :size     "none"
-           :padding  "0 1em"
-           :children [[h-box :align :center
-                             :children [[box :size "auto" :child [title :level :level2 :label "Info"]]
-                                        [md-icon-button :md-icon-name "zmdi-close"
-                                                        :size         :regular
-                                                        :on-click     #(dispatch [:images/close-info])]]]
-                      [box :child [:pre printed-info]]]]))
 
 (defn carousel-view
   "Display stored photo sequence in a full-screen carousel view."
@@ -98,7 +46,7 @@
                        :content  [carousel :model      cursor
                                            :on-rewind  on-rewind
                                            :on-advance on-advance
-                                           :render-fn  scaled-photo]])))
+                                           :render-fn  images/fullscreen-photo]])))
 
 (reg-sub
   :images/selected?
@@ -124,15 +72,18 @@
 
 
 (defn index-image
-  [path idx items]
-  (let [selected? (subscribe [:images/selected? path])
-        on-click  #(dispatch [:images/open-carousel idx items])
-        on-select #(dispatch [:images/toggle-selection path])]
-    [:div
-     {:style {:position "relative"}}
-     [selection-icon selected? on-select]
-     [images/render :path     path
-                    :on-click on-click]]))
+  [path _ idx items]
+  (let [selected?  (subscribe [:images/selected? path])
+        preloaded? (subscribe [:images/preloaded? path])
+        on-click   #(dispatch [:images/open-carousel idx items])
+        on-select  #(dispatch [:images/toggle-selection path])]
+    (fn [path aspect idx items]
+      (when @preloaded?
+        [:div.gallery-image
+         {:style {:position "relative"
+                  :padding (if @selected? (str "1em " aspect "em") "0")}}
+         [selection-icon selected? on-select]
+         [images/block-image :path path :on-click on-click]]))))
 
 (def MONTHS
   ["January"

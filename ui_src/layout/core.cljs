@@ -46,7 +46,7 @@
                                 :top      y
                                 :width    width
                                 :height   height}}
-                       [render-fn id item-idx item-ids]])
+                       [render-fn id (/ width height) item-idx item-ids]])
                     paint-list))]))
 
 (defn measure-node!
