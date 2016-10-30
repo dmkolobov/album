@@ -5,28 +5,34 @@
 (def transition-group
   (reagent/adapt-react-class js/React.addons.TransitionGroup))
 
-(def slide-in
+(defn slide-in-right
+  [cb]
+  (this-as owner
+    (let [node  (reagent/dom-node owner)]
+      (aset node "style" "width" "auto")
+      (let [target (.-width (js/getComputedStyle node))]
+        (aset node "style" "marginRight" (str "-" target))
+        (aget node "offsetLeft") ;; force repaint
+        (aset node "style" "transition" "margin-right 100ms ease-out")
+        (aset node "style" "marginRight" 0))
+      (cb))))
+
+(defn slide-out-right
+  [cb]
+  (this-as owner
+    (let [node  (reagent/dom-node owner)]
+      (aset node "style" "width" "auto")
+      (let [target (.-width (js/getComputedStyle node))]
+        (aset node "style" "transition" "margin-right 100ms ease-out")
+        (aset node "style" "marginRight" (str "-" target))
+        (.addEventListener node
+                           "transitionend"
+                           cb)))))
+
+(def right-sheet
   (reagent/create-class
-    {:component-will-enter (fn [cb]
-                             (this-as owner
-                               (let [node  (reagent/dom-node owner)]
-                                 (aset node "style" "width" "auto")
-                                 (let [target (.-width (js/getComputedStyle node))]
-                                   (aset node "style" "marginRight" (str "-" target))
-                                   (aget node "offsetLeft") ;; force repaint
-                                   (aset node "style" "transition" "margin-right 100ms ease-out")
-                                   (aset node "style" "marginRight" 0))
-                                 (cb))))
-     :component-will-leave (fn [cb]
-                             (this-as owner
-                               (let [node  (reagent/dom-node owner)]
-                                 (aset node "style" "width" "auto")
-                                 (let [target (.-width (js/getComputedStyle node))]
-                                   (aset node "style" "transition" "margin-right 100ms ease-out")
-                                   (aset node "style" "marginRight" (str "-" target))
-                                   (.addEventListener node
-                                                      "transitionend"
-                                                      cb)))))
+    {:component-will-enter slide-in-right
+     :component-will-leave slide-out-right
      :reagent-render       identity}))
 
 (defn sidebar-split
@@ -37,7 +43,7 @@
          :style    {:position "relative"
                     :overflow "hidden"}
          :children [content
-                    [transition-group {:transition-name "foobar"}
+                    [transition-group
                        (when sidebar
                          ^{:key "sidebar"}
-                         [slide-in sidebar])]]])
+                         [right-sheet sidebar])]]])
