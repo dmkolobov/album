@@ -68,21 +68,29 @@
           copy-event    [:fs/copy {:src-path src-path :dest-path dest-path}]
           preload-event [:img/preload {:path dest-path}]]
       {:async-flow
+       ;; First, we read image data such as filesize, exif data, and dimensions.
        {:first-dispatch read-event
 
-        :rules [{:when     :seen?
+        :rules [;; Once the image data is loaded, we copy the image
+                ;; to the imports directory.
+                {:when     :seen?
                  :event    [:async/success read-event]
                  :dispatch copy-event}
 
+                ;; When the image is copied, we preload the image.
                 {:when       :seen?
                  :event      [:async/success copy-event]
                  :dispatch   preload-event}
 
+                ;; After preloading, we mark the image import process as
+                ;; successful.
                 {:when       :seen?
                  :event      [:async/success preload-event]
                  :dispatch-n [on-success [:image/mark-loaded dest-path]]
                  :halt?      true}
 
+                ;; Upon any errors we capture the error and mark this process
+                ;; as failed.
                 {:when     :seen-any-of?
                  :events   [[:async/error copy-event] [:async/error read-event]]
                  :dispatch on-error
