@@ -16,10 +16,10 @@
   [& {:keys [content actions sidebar on-close]}]
   [sidebar-split :class "fullscreen"
                  :content [v-box :size     "auto"
-                           :height   "100%"
-                           :style    {:position "relative"}
-                           :children [[base-toolbar :class         "fullscreen-toolbar"
-                                                    :logo          [return-button on-close]
-                                                    :right-content actions]
+                                 :height   "100%"
+                                 :style    {:position "relative"}
+                                 :children [[base-toolbar :class         "fullscreen-toolbar"
+                                                          :logo          [return-button on-close]
+                                                          :right-content actions]
                                       content]]
                  :sidebar sidebar])
