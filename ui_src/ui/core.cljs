@@ -100,10 +100,39 @@
                                            :on-advance on-advance
                                            :render-fn  scaled-photo]])))
 
+(reg-sub
+  :images/selected?
+  (fn [db [_ path]]
+    (contains? (get db :images/selection) path)))
+
+(reg-event-db
+  :images/toggle-selection
+  (fn [db [_ path]]
+    (let [s (get db :images/selection #{})]
+      (assoc db
+        :images/selection (if (contains? s path)
+                            (disj s path)
+                            (conj s path))))))
+
+(defn selection-icon
+  [selected? on-select]
+  [md-icon-button :md-icon-name (if @selected? "zmdi-check-circle" "zmdi-circle-o")
+                  :emphasise?   @selected?
+                  :size         :regular
+                  :style        {:position "absolute" :left "0.25em" :top "0.25em"}
+                  :on-click     on-select])
+
+
 (defn index-image
   [path idx items]
-  (let [on-click #(dispatch [:images/open-carousel idx items])]
-    [images/render :path path :on-click on-click]))
+  (let [selected? (subscribe [:images/selected? path])
+        on-click  #(dispatch [:images/open-carousel idx items])
+        on-select #(dispatch [:images/toggle-selection path])]
+    [:div
+     {:style {:position "relative"}}
+     [selection-icon selected? on-select]
+     [images/render :path     path
+                    :on-click on-click]]))
 
 (def MONTHS
   ["January"
