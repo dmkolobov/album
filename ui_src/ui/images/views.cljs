@@ -13,4 +13,4 @@
         [box :class   "image-throbber"
              :align   :center
              :justify :center
-             :child   [throbber]]))))
+             :child   [:span ""]]))))

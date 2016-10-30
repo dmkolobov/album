@@ -18,7 +18,8 @@
             [ui.images.views :as images]
 
             [ui.views.common.toolbar :refer [base-toolbar]]
-            
+            [ui.views.main :refer [main-view]]
+
             [ui.controls.views :as controls]
             [ui.controls.events]
             [ui.controls.subs]
@@ -26,18 +27,6 @@
             [ui.views.carousel :refer [carousel]]))
 
 (enable-console-print!)
-
-(defn main-view
-  [& {:keys [toolbar content]}]
-  [v-box :size     "100%"
-         :height   "100%"
-         :children [toolbar
-                    [h-box :size     "auto"
-                           :children [[controls/sidebar]
-                                      [scroller :size       "100%"
-                                                :padding    "1em 1em 1em 0"
-                                                :v-scroll   :auto
-                                                :child      content]]]]])
 
 (defn return-button
   []
@@ -48,7 +37,7 @@
                   :on-click         #(dispatch [:controls/pop-view])])
 
 (defn stacked-view
-  [& {:keys [toolbar-content content on-close]}]
+  [& {:keys [content]}]
   [v-box :size     "auto"
          :height   "100%"
          :children [[base-toolbar :class    "slideshow-toolbar"
@@ -65,7 +54,6 @@
         render-fn  (fn [path] [images/render :path path])]
     (fn []
       [stacked-view :on-close on-close
-                    :actions  [label :label "foobar"]
                     :content  [carousel :model      cursor
                                         :on-rewind  on-rewind
                                         :on-advance on-advance
@@ -119,15 +107,13 @@
 (defn photos-view
   "Display a gallery of all photos in your Album library."
   []
-  [main-view :toolbar [controls/main-toolbar :title "Photos"]
-             :content ;;[box :size    "100%"
-                      ;;     :padding "1em 1.5em 1em 0"
-                      [photo-gallery]])
+  [main-view :title   "Photos"
+             :content [photo-gallery]])
 
 (defn albums-view
   "Display a gallery of all albums in your Album library."
   []
-  [main-view :toolbar [controls/main-toolbar :title "Albums"]
+  [main-view :title   "Albums"
              :content [:div "Coming soon..."]])
 
 (def views

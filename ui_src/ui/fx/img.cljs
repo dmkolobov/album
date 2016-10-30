@@ -43,7 +43,7 @@
   :img/preload
   (fn [{:keys [path on-success on-error]}]
     (let [image (js/Image.)]
-      (.addEventListener image "load" #(dispatch on-success))
+      (aset image "onload" #(dispatch on-success))
       (aset image "src" path))))
 
 (reg-fx-service
