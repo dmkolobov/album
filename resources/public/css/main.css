@@ -138,3 +138,12 @@ body {
 .selection-button:hover {
     color: #aaa;
 }
+
+.gallery-image {
+  padding: 0;
+  transition: padding 75ms ease-in;
+}
+
+.gallery-image.active {
+  transition: padding 75ms ease-in;
+}

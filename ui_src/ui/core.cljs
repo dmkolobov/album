@@ -67,7 +67,9 @@
   [md-icon-button :md-icon-name (if @selected? "zmdi-check-circle" "zmdi-circle-o")
                   :emphasise?   @selected?
                   :size         :regular
-                  :style        {:position "absolute" :left "0.25em" :top "0.25em"}
+                  :style        {:position "absolute"
+                                 :left "0.25em"
+                                 :top "0.25em"}
                   :on-click     on-select])
 
 
@@ -80,9 +82,11 @@
     (fn [path aspect idx items]
       (when @preloaded?
         [:div.gallery-image
-         {:style {:position "relative"
-                  :padding (if @selected? (str "1em " aspect "em") "0")}}
-         [selection-icon selected? on-select]
+         {:class (when @selected? "active")
+          :style {:position   "relative"
+                  :background "#eeeeee"
+                  :padding    (if @selected? (str "1em " aspect "em") "0")}}
+         [:div {:style {:background "none"}} [selection-icon selected? on-select]]
          [images/block-image :path path :on-click on-click]]))))
 
 (def MONTHS
