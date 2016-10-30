@@ -27,7 +27,7 @@
    :height   "100%"
    :children [[main-toolbar title]
               [h-box :size     "auto"
-                     :children [[sidebar]
+                     :children [;;[sidebar]
                                 [scroller :size     "100%"
                                           :padding  "1em 1em 1em 0"
                                           :v-scroll :auto

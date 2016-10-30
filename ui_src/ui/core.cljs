@@ -1,7 +1,7 @@
 (ns ui.core
   (:require [reagent.core :as reagent :refer [atom]]
             [re-frame.core :refer [reg-event-fx reg-fx trim-v reg-event-db reg-sub dispatch subscribe]]
-            [re-com.core :refer [md-circle-icon-button h-box v-box box throbber title label button scroller h-split]]
+            [re-com.core :refer [md-icon-button h-box v-box box throbber title label button scroller h-split]]
             [day8.re-frame.async-flow-fx]
             [re-com.core]
 
@@ -16,6 +16,8 @@
             [ui.images.events]
             [ui.images.subs]
             [ui.images.views :as images]
+
+            [ui.views.common.toolbar :refer [base-toolbar]]
             
             [ui.controls.views :as controls]
             [ui.controls.events]
@@ -37,14 +39,20 @@
                                                 :v-scroll   :auto
                                                 :child      content]]]]])
 
+(defn return-button
+  []
+  [md-icon-button :md-icon-name     "zmdi-arrow-left"
+                  :size             :regular
+                  :tooltip          "Return"
+                  :tooltip-position :below-right
+                  :on-click         #(dispatch [:controls/pop-view])])
+
 (defn stacked-view
   [& {:keys [toolbar-content content on-close]}]
   [v-box :size     "auto"
          :height   "100%"
-         :children [[controls/toolbar :icon     "zmdi-arrow-left"
-                                      :tooltip  "Close"
-                                      :on-click on-close
-                                      :content  toolbar-content]
+         :children [[base-toolbar :class    "slideshow-toolbar"
+                                  :logo     [return-button]]
                     content]])
 
 (defn carousel-view

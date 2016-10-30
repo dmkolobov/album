@@ -2,6 +2,7 @@
   (:require [re-frame.core :refer [subscribe dispatch]]
             [reagent.core :as reagent]
             [ui.views.common.menu :refer [menu]]
+            [ui.views.common.toolbar :refer [base-toolbar]]
             [re-com.core :as re-com :refer [md-icon-button hyperlink title v-box box h-box]]))
 
 (defn import-button
@@ -68,29 +69,20 @@
                              :label-fn  label-sidebar-item
                              :class     "collapsed"
                              :on-change swap-view]]])))
-(defn toolbar
-  [& {:keys [icon tooltip on-click content class]}]
-  [h-box :class    (str "toolbar " class)
-         :size     "none"
-         :gap      "2em"
-         :padding  "1em 1.5em"
-         :align    :baseline
-         :children [[md-icon-button :md-icon-name     icon
-                                    :size             :regular
-                                    :tooltip          tooltip
-                                    :tooltip-position :below-center
-                                    :on-click         on-click]
-                    content]])
+(defn main-menu-button
+  []
+  [md-icon-button :md-icon-name     "zmdi-menu"
+                  :size             :regular
+                  :tooltip          "Main Menu"
+                  :tooltip-position :below-right
+                  :on-click         #(dispatch [:controls/open-left-sidebar])])
 
 (defn main-toolbar
   [& {:keys [title]}]
-  [toolbar :icon     "zmdi-menu"
-           :tooltip  "Main menu"
-           :on-click #(dispatch [:controls/open-left-sidebar])
-           :content  [h-box :size "none"
-                            :align :center
-                            :children [[re-com/title :level :level2
-                                                     :margin-top    "0px"
-                                                     :margin-bottom "0px"
-                                                     :label title]
-                                       [import-button]]]])
+  [base-toolbar :class "main-menu"
+                :logo  [main-menu-button]
+                :left-content [re-com/title :level         :level2
+                                            :margin-top    "0px"
+                                            :margin-bottom "0px"
+                                            :label         title]
+                :right-content [import-button]])

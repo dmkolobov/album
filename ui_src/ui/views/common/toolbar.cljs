@@ -3,7 +3,7 @@
 
 (defn base-toolbar
   [& {:keys [class
-             logo-icon
+             logo
              left-content
              center-content
              right-content]}]
@@ -12,10 +12,11 @@
          :gap      "2em"
          :padding  "1em 1.5em"
          :align    :baseline
-         :children [logo-icon
+         :children [[box :size "none" :child logo]
                     (when left-content
                       [box :size "none" :child left-content])
-                    (when center-content
-                      [box :size "auto" :child center-content])
+                    [box :size "auto" :child (if center-content
+                                               center-content
+                                               [:span ""])]
                     (when right-content
                       [box :size "none" :child right-content])]])
