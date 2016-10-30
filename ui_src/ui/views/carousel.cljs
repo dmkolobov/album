@@ -18,14 +18,25 @@
     [h-box :size     "100%"
            :width    "100%"
            :align    :center
-           :children [[box :size     "none"
-                           :padding  "1em"
-                           :child    [carousel-left on-rewind]]
+           :style    {:position "relative"}
+           :children [[box :size    "none"
+                           :align   :center
+                           :class   "fullscreen-button"
+                           :padding "1em"
+                           :style   {:position "absolute"
+                                     :left     "0"}
+                           :attr {:on-click  on-rewind}
+                           :child   [carousel-left on-rewind]]
 
-                      [box :size    "auto"
-                           :height  "100%"
-                           :child   [render-fn id data]]
+                      [box :size   "auto"
+                           :height "100%"
+                           :child  [render-fn id data]]
 
-                      [box :size     "none"
-                           :padding  "1em"
-                           :child    [carousel-right on-advance]]]]))
+                      [box :size    "none"
+                           :align   :center
+                           :class   "fullscreen-button"
+                           :padding "1em"
+                           :style   {:position "absolute"
+                                     :right     "0"}
+                           :attr {:on-click on-advance}
+                           :child   [carousel-right on-advance]]]]))

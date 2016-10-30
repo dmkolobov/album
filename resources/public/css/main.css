@@ -117,3 +117,16 @@ body {
 .fullscreen-sidebar {
   background: #fff;
 }
+
+.fullscreen-button {
+  z-index: 2;
+  color: #aaa;
+  font-weight: bold;
+  top: 0;
+  bottom: 0;
+}
+
+.fullscreen-button .rc-md-circle-icon-button{
+    color: #000;
+    background: #aaa;
+}
