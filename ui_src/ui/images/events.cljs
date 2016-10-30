@@ -157,3 +157,11 @@
   :images/rewind-carousel
   (fn [db _]
     (update-in db [:images/carousel-state :idx] dec)))
+
+(reg-event-db
+  :images/open-info
+  (fn [db] (assoc db :images/info? true)))
+
+(reg-event-db
+  :images/close-info
+  (fn [db] (dissoc db :images/info?)))

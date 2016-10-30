@@ -29,25 +29,68 @@
 
 (enable-console-print!)
 
+(defn info-button
+  []
+  [md-icon-button :md-icon-name     "zmdi-info"
+                  :size             :regular
+                  :tooltip          "Info"
+                  :tooltip-position :below-left
+                  :on-click         #(dispatch [:images/open-info])])
+
+(defn display-photo
+  [path {:keys [aspect]}]
+  [:div
+   {:style
+    (if (< aspect 1)
+
+      {:display        "block"
+       :position       "relative"
+       :width          "0"
+       :height         "100%"
+       :padding-right  (str (* aspect 100) "%")
+       :margin         "auto"}
+
+      {:display        "block"
+       :position       "relative"
+       :width          "100%"
+       :height         "0"
+       :padding-top    (str (* (/ 1 aspect) 100) "%")
+       :margin         "auto"})}
+   [images/render :path path :absolute? true]])
+
+(defn display-info
+  [model]
+  (let [[path info]  @model
+        printed-info (with-out-str (pprint info))]
+    ^{:key path}
+    [v-box :class    "fullscreen-sidebar"
+           :height   "100%"
+           :size     "none"
+           :padding  "0 1em"
+           :children [[h-box :align :center
+                             :children [[box :size "auto" :child [title :level :level2 :label "Info"]]
+                                        [md-icon-button :md-icon-name "zmdi-close"
+                                                        :size         :regular
+                                                        :on-click     #(dispatch [:images/close-info])]]]
+                      [box :child [:pre printed-info]]]]))
+
 (defn carousel-view
   "Display stored photo sequence in a full-screen carousel view."
   []
-  (let [cursor     (subscribe [:images/carousel-cursor])
+  (let [cursor     (subscribe [:images/cursor])
+        info?      (subscribe [:images/info?])
+
         on-rewind  #(dispatch [:images/rewind-carousel])
         on-advance #(dispatch [:images/advance-carousel])
-        on-close   #(dispatch [:images/close-carousel])
-        render-fn  (fn [path {:keys [aspect]}]
-                     (println "aspect" aspect)
-                     [:div
-                      {:style {:max-width (str (* 100 aspect) "%")
-                               :margin    "auto"}}
-                      [images/render :path path]])]
+        on-close   #(dispatch [:images/close-carousel])]
     (fn []
       [fullscreen-view :on-close on-close
+                       :actions  [info-button]
+                       :sidebar  (when @info? [display-info cursor])
                        :content  [carousel :model      cursor
                                            :on-rewind  on-rewind
                                            :on-advance on-advance
-                                           :render-fn  render-fn]])))
+                                           :render-fn  display-photo]])))
 
 (defn index-image
   [path idx items]

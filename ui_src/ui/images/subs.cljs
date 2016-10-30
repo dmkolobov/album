@@ -35,9 +35,14 @@
   (fn [db [_ path]] (get-in db [:preloaded? path])))
 
 (reg-sub
-  :images/carousel-cursor
+  :images/cursor
   (fn [db _]
     (let [{:keys [items idx]} (get db :images/carousel-state)
           path (nth items idx)
           info (get-in db [:image-info path])]
       [path info])))
+
+(reg-sub
+  :images/info?
+  (fn [db]
+    (get db :images/info?)))

@@ -32,15 +32,6 @@ body {
 
 .active .sidebar-label { color: inherit; }
 
-/* ---- images ---- */
-
-.image {
-  display: block
-  z-index:        1;
-  max-height:     100%;
-  max-width:      100%;
-}
-
 /* ---- sidebar animation ---- */
 
 .sidebar { width: 200px; }
@@ -117,8 +108,12 @@ body {
 .fullscreen-toolbar {
   color: #fff;
   box-shadow: none;
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
   width: 100%;
+}
+
+.fullscreen-sidebar {
+  background: #fff;
 }

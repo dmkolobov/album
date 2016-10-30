@@ -18,6 +18,7 @@
          :height   "100%"
          :children [[v-box :size     "auto"
                            :height   "100%"
+                           :style    {:position "relative"}
                            :children [[base-toolbar :class         "fullscreen-toolbar"
                                                     :logo          [return-button on-close]
                                                     :right-content actions]

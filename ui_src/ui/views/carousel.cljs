@@ -24,7 +24,6 @@
 
                       [box :size    "auto"
                            :height  "100%"
-                           :align   :center
                            :child   [render-fn id data]]
 
                       [box :size     "none"
