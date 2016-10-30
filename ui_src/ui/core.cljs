@@ -37,26 +37,34 @@
                   :tooltip-position :below-left
                   :on-click         #(dispatch [:images/open-info])])
 
-(defn display-photo
+(defn scaled-photo
   [path {:keys [aspect]}]
-  [:div
-   {:style
-    (if (<= aspect 1)
+    (cond ;; square
+          (= aspect 1)
+          [:div {:display        "block"
+                 :position       "relative"
+                 :width          "0"
+                 :height         "100%"
+                 :padding-left   (str (* (/ 1 aspect) 100) "%")
+                 :margin         "auto"}
+           [images/render :path path :absolute? true]]
 
-      {:display        "block"
-       :position       "relative"
-       :width          "0"
-       :height         "100%"
-       :padding-right  (str (* aspect 100) "%")
-       :margin         "auto"}
+          ;; landscape
+          (> aspect 1)
+          [box :size "100%"
+               :height "100%"
+               :align  :center
+               :child [images/render :path path :absolute? true]]
 
-      {:display        "block"
-       :position       "relative"
-       :width          "100%"
-       :height         "0"
-       :padding-top    (str (* (/ 1 aspect) 100) "%")
-       :margin         "auto"})}
-   [images/render :path path :absolute? true]])
+          ;; portrait
+          (< aspect 1)
+          [:div {:display        "block"
+                 :position       "relative"
+                 :width          "0"
+                 :height         "100%"
+                 :padding-left    (str (* aspect 100) "%")
+                 :margin         "auto"}
+           [images/render :path path :absolute? true]]))
 
 (defn display-info
   [model]
@@ -90,7 +98,7 @@
                        :content  [carousel :model      cursor
                                            :on-rewind  on-rewind
                                            :on-advance on-advance
-                                           :render-fn  display-photo]])))
+                                           :render-fn  scaled-photo]])))
 
 (defn index-image
   [path idx items]
