@@ -41,7 +41,7 @@
   [path {:keys [aspect]}]
   [:div
    {:style
-    (if (< aspect 1)
+    (if (<= aspect 1)
 
       {:display        "block"
        :position       "relative"
