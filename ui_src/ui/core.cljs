@@ -36,7 +36,12 @@
         on-rewind  #(dispatch [:images/rewind-carousel])
         on-advance #(dispatch [:images/advance-carousel])
         on-close   #(dispatch [:images/close-carousel])
-        render-fn  (fn [path] [images/render :path path])]
+        render-fn  (fn [path {:keys [aspect]}]
+                     (println "aspect" aspect)
+                     [:div
+                      {:style {:max-width (str (* 100 aspect) "%")
+                               :margin    "auto"}}
+                      [images/render :path path]])]
     (fn []
       [fullscreen-view :on-close on-close
                        :content  [carousel :model      cursor

@@ -37,5 +37,7 @@
 (reg-sub
   :images/carousel-cursor
   (fn [db _]
-    (let [{:keys [items idx]} (get db :images/carousel-state)]
-      (nth items idx))))
+    (let [{:keys [items idx]} (get db :images/carousel-state)
+          path (nth items idx)
+          info (get-in db [:image-info path])]
+      [path info])))

@@ -13,19 +13,20 @@
 
 (defn carousel
   [& {:keys [model on-advance on-rewind render-fn]}]
-  ^{:key @model}
-  [h-box :size     "100%"
-         :width    "100%"
-         :align    :center
-         :children [[box :size     "none"
-                         :padding  "1em"
-                         :child    [carousel-left on-rewind]]
+  (let [[id data] @model]
+    ^{:key id}
+    [h-box :size     "100%"
+           :width    "100%"
+           :align    :center
+           :children [[box :size     "none"
+                           :padding  "1em"
+                           :child    [carousel-left on-rewind]]
 
-                    [box :size    "auto"
-                         :height  "100%"
-                         :align   :center
-                         :child   [render-fn @model]]
+                      [box :size    "auto"
+                           :height  "100%"
+                           :align   :center
+                           :child   [render-fn id data]]
 
-                    [box :size     "none"
-                         :padding  "1em"
-                         :child    [carousel-right on-advance]]]])
+                      [box :size     "none"
+                           :padding  "1em"
+                           :child    [carousel-right on-advance]]]]))
