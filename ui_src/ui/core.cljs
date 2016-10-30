@@ -19,6 +19,7 @@
 
             [ui.views.common.toolbar :refer [base-toolbar]]
             [ui.views.main :refer [main-view]]
+            [ui.views.fullscreen :refer [fullscreen-view]]
 
             [ui.controls.views :as controls]
             [ui.controls.events]
@@ -27,22 +28,6 @@
             [ui.views.carousel :refer [carousel]]))
 
 (enable-console-print!)
-
-(defn return-button
-  []
-  [md-icon-button :md-icon-name     "zmdi-arrow-left"
-                  :size             :regular
-                  :tooltip          "Return"
-                  :tooltip-position :below-right
-                  :on-click         #(dispatch [:controls/pop-view])])
-
-(defn stacked-view
-  [& {:keys [content]}]
-  [v-box :size     "auto"
-         :height   "100%"
-         :children [[base-toolbar :class    "slideshow-toolbar"
-                                  :logo     [return-button]]
-                    content]])
 
 (defn carousel-view
   "Display stored photo sequence in a full-screen carousel view."
@@ -53,11 +38,11 @@
         on-close   #(dispatch [:images/close-carousel])
         render-fn  (fn [path] [images/render :path path])]
     (fn []
-      [stacked-view :on-close on-close
-                    :content  [carousel :model      cursor
-                                        :on-rewind  on-rewind
-                                        :on-advance on-advance
-                                        :render-fn  render-fn]])))
+      [fullscreen-view :on-close on-close
+                       :content  [carousel :model      cursor
+                                           :on-rewind  on-rewind
+                                           :on-advance on-advance
+                                           :render-fn  render-fn]])))
 
 (defn index-image
   [path idx items]
@@ -125,7 +110,6 @@
   []
   (let [current-view (subscribe [:controls/current-view])]
     (fn []
-      (println @current-view)
       [(get views @current-view)])))
 
 (reagent/render
