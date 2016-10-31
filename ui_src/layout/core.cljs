@@ -109,18 +109,13 @@
                 :width    "100%"
                 :children (doall
                             (map (fn [row]
-                                   (cond (= 0 (count row))
-                                         (println "blank row!")
-
-                                         (= 1 (count row))
-                                         [group-fn (:id (first row)) (:items (first row)) [paint-layout item-fn (first row)]]
+                                   (cond (= 1 (count row))
+                                         (let [{:keys [id items] :as layout} (first row)]
+                                           [group-fn id items [paint-layout item-fn layout]])
 
                                          :default [h-box :gap      (str group-gap "px")
                                                          :size     "none"
                                                          :width    "100%"
-                                                         :margin   (if (= row (last @group-layout))
-                                                                     "0 0 1em 0"
-                                                                     "0px")
                                                          :children (map (fn [{:keys [id items] :as layout}]
                                                                           [group-fn id items [paint-layout item-fn layout]])
                                                                         row)]))
