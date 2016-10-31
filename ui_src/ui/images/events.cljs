@@ -158,6 +158,8 @@
   (fn [db _]
     (update-in db [:images/carousel-state :idx] dec)))
 
+; -------- info ---------
+
 (reg-event-db
   :images/open-info
   (fn [db] (assoc db :images/info? true)))

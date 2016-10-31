@@ -171,7 +171,7 @@ body {
 .gallery-title {
   position: relative;
   left: 0;
-  transition: left 100ms ease-in 2s;
+  transition: left 100ms ease-in .2s;
 }
 
 .gallery-header {
@@ -181,18 +181,26 @@ body {
 .gallery-header:hover .gallery-title,
 .gallery-header.active .gallery-title {
   left: 2em;
-  transition: left 100ms ease-in .25s;
+  transition: left 100ms ease-in .1s;
 }
 
 .gallery-selection-icon {
   position: absolute;
   font-size: 24px;
   opacity: 0;
-  transition: opacity 100ms ease-in 1.9s;
+  transition: opacity 100ms ease-in .1s;
 }
 
 .gallery-header:hover .gallery-selection-icon,
 .gallery-header.active .gallery-selection-icon {
   opacity: 1;
-  transition: opacity 100ms ease-in .35s;
+  transition: opacity 100ms ease-in .2s;
+}
+
+.selection-menu {
+  color:      #fff;
+  background: #2196f3;
+}
+.selection-menu .rc-title {
+  color: #fff;
 }

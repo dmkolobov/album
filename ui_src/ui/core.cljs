@@ -76,12 +76,19 @@
 (reg-event-db
   :selection/include-ids
   (fn [db [_ ids]]
-    (update db :selection/id-set into ids)))
+    (update db
+            :selection/id-set
+            (fn [id-set]
+              (if id-set (into id-set ids) (set ids))))))
 
 (reg-event-db
   :selection/exclude-ids
   (fn [db [_ ids]]
     (apply update db :selection/id-set disj ids)))
+
+(reg-event-db
+  :selection/discard
+  (fn [db] (dissoc db :selection/id-set)))
 
 (defn group-header
   [label ids]
@@ -138,6 +145,12 @@
                       :group-gap 50
                       :group-fn  gallery-group])))
 
+(defn group-info-button
+  []
+  [md-icon-button :md-icon-name "zmdi-info"
+                  :size         :regular
+                  :on-click     #(dispatch [:images/open-multiple-info])])
+
 (defn photos-view
   "Display a gallery of all photos in your Album library."
   []
@@ -146,7 +159,8 @@
       [main-view :title   (if (> @selection-count 0)
                             (str "Photos - " @selection-count)
                             "Photos")
-                 :content [photo-gallery]])))
+                 :content [photo-gallery]
+                 :select-actions [group-info-button]])))
 
 (defn albums-view
   "Display a gallery of all albums in your Album library."

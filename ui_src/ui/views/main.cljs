@@ -23,7 +23,7 @@
                   :tooltip-position :below-left
                   :on-click         #(dispatch [:start-import])])
 
-(defn main-toolbar
+(defn main-toolbar*
   [title]
   [base-toolbar :class "main-menu"
                 :logo  [main-menu-button]
@@ -32,6 +32,26 @@
                                             :margin-bottom "0px"
                                             :label         title]
                 :right-content [import-button]])
+
+(defn unselect-button
+  []
+  [md-icon-button :md-icon-name     "zmdi-close"
+                  :size             :regular
+                  :on-click         #(dispatch [:selection/discard])])
+
+(defn main-toolbar
+  [& _]
+  (let [selection-count (subscribe [:selection/count])]
+    (fn [& {:keys [title select-actions]}]
+      (if (> @selection-count 0)
+        [base-toolbar :class        "selection-menu"
+                      :logo         [unselect-button]
+                      :left-content [re-com/title :label (str @selection-count " selected")
+                                                  :margin-top    "0px"
+                                                  :margin-bottom "0px"
+                                                  :level :level2]
+                      :right-content select-actions]
+        [main-toolbar* title]))))
 
 ;; -------- sidebar --------
 
@@ -95,10 +115,11 @@
 ;; -------- content ---------
 
 (defn main-view
-  [& {:keys [title content]}]
+  [& {:keys [title content select-actions]}]
   [v-box :size     "100%"
          :height   "100%"
-         :children [[main-toolbar title]
+         :children [[main-toolbar :title          title
+                                  :select-actions select-actions]
                     [h-box :size     "auto"
                            :children [[sidebar]
                                       [scroller :size       "100%"
