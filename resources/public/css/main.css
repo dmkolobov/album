@@ -73,7 +73,7 @@ body {
 
 .list-group-item.active {
   background-color: #eeeeee;
-  color: #337ab7;
+  color: #2196f3;
 }
 
 .list-group-item:hover, .list-group-item.active:hover {
@@ -82,7 +82,7 @@ body {
 }
 
 .list-group-item.active:hover {
-  color: #337ab7;
+  color: #2196f3;
 }
 
 /* ---- sidebar ---- */
@@ -146,4 +146,16 @@ body {
 
 .gallery-image.active {
   transition: padding 75ms ease-in;
+}
+
+.photo-selection-icon {
+  color: rgba(211,211,211,0.85);
+}
+
+.photo-selection-icon:hover {
+  color: #fff;
+}
+
+.photo-selection-icon.active {
+  color: #2196f3;
 }

@@ -64,12 +64,13 @@
 
 (defn selection-icon
   [selected? on-select]
-  [md-icon-button :md-icon-name (if @selected? "zmdi-check-circle" "zmdi-circle-o")
-                  :emphasise?   @selected?
+  [md-icon-button :md-icon-name "zmdi-check-circle"
+                  :class        (str "photo-selection-icon "
+                                     (when @selected? "active"))
                   :size         :regular
                   :style        {:position "absolute"
-                                 :left "0.25em"
-                                 :top "0.25em"}
+                                 :left     "0.25em"
+                                 :top      "0.25em"}
                   :on-click     on-select])
 
 
