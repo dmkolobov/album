@@ -158,11 +158,41 @@ body {
   color: #fff;
 }
 
-.photo-selection-icon.active {
+.photo-selection-icon.active,
+.active .gallery-selection-icon {
   opacity: 1;
   color: #2196f3;
 }
 
 .gallery-image:hover .photo-selection-icon {
   opacity: 1;
+}
+
+.gallery-title {
+  position: relative;
+  left: 0;
+  transition: left 100ms ease-in 2s;
+}
+
+.gallery-header {
+  position: relative;
+}
+
+.gallery-header:hover .gallery-title,
+.gallery-header.active .gallery-title {
+  left: 2em;
+  transition: left 100ms ease-in .25s;
+}
+
+.gallery-selection-icon {
+  position: absolute;
+  font-size: 24px;
+  opacity: 0;
+  transition: opacity 100ms ease-in 1.9s;
+}
+
+.gallery-header:hover .gallery-selection-icon,
+.gallery-header.active .gallery-selection-icon {
+  opacity: 1;
+  transition: opacity 100ms ease-in .35s;
 }

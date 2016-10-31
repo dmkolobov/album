@@ -52,8 +52,13 @@
 
 (reg-sub
   :selection/contains?
-  (fn [db [_ path]]
-    (contains? (get db :selection/id-set) path)))
+  (fn [db [_ id]]
+    (contains? (get db :selection/id-set) id)))
+
+(reg-sub
+  :selection/contains-all?
+  (fn [db [_ ids]]
+    (clojure.set/subset? (set ids) (get db :selection/id-set #{}))))
 
 (reg-event-db
   :selection/toggle-id
@@ -63,6 +68,41 @@
         :selection/id-set (if (contains? s path)
                             (disj s path)
                             (conj s path))))))
+
+(reg-event-db
+  :selection/include-ids
+  (fn [db [_ ids]]
+    (update db :selection/id-set into ids)))
+
+(reg-event-db
+  :selection/exclude-ids
+  (fn [db [_ ids]]
+    (apply update db :selection/id-set disj ids)))
+
+(defn group-header
+  [label ids]
+  (let [selected? (subscribe [:selection/contains-all? ids])]
+    (fn [label ids]
+      [h-box
+       :align     :center
+       :class     (str "gallery-header " (when @selected? "active"))
+       :children [[md-icon-button :class        "gallery-selection-icon"
+                                  :md-icon-name "zmdi-check-circle"
+                                  :size         :regular
+                                  :on-click    (if @selected?
+                                                 #(dispatch [:selection/exclude-ids ids])
+                                                 #(dispatch [:selection/include-ids ids]))]
+                  [title :class "gallery-title"
+                         :label label
+                         :level :level3]]])))
+
+(defn gallery-group
+  [date items layout]
+  [v-box :size     "none"
+         :gap      "1em"
+         :children [^{:key (hash items)} [group-header (date-string date) items]
+                    [box :size  "auto"
+                         :child layout]]])
 
 (defn gallery-image
   "Display an image in the photo gallery. A checkmark circle icon allows for selection
@@ -83,16 +123,6 @@
                          :on-click     on-select]
          [images/block-image :path     path
                              :on-click #(dispatch [:images/open-carousel idx items])]]))))
-
-
-(defn gallery-group
-  [date items layout]
-  [v-box :size     "none"
-         :gap      "1em"
-         :children [[title :label (date-string date)
-                           :level :level3]
-                    [box :size  "auto"
-                         :child layout]]])
 
 (defn photo-gallery
   []
