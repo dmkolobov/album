@@ -31,7 +31,7 @@
 (enable-console-print!)
 
 (defn carousel-view
-  "Display stored photo sequence in a full-screen carousel view."
+  "Display photo results in a full-screen carousel view."
   []
   (let [cursor     (subscribe [:images/cursor])
         info?      (subscribe [:images/info?])
@@ -49,45 +49,38 @@
                                            :render-fn  images/fullscreen-photo]])))
 
 (reg-sub
-  :images/selected?
+  :selection/contains?
   (fn [db [_ path]]
-    (contains? (get db :images/selection) path)))
+    (contains? (get db :selection/id-set) path)))
 
 (reg-event-db
-  :images/toggle-selection
+  :selection/toggle-id
   (fn [db [_ path]]
-    (let [s (get db :images/selection #{})]
+    (let [s (get db :selection/id-set #{})]
       (assoc db
-        :images/selection (if (contains? s path)
+        :selection/id-set (if (contains? s path)
                             (disj s path)
                             (conj s path))))))
 
-(defn selection-icon
-  [selected? on-select]
-  [md-icon-button :md-icon-name "zmdi-check-circle"
-                  :class        (str "photo-selection-icon "
-                                     (when @selected? "active"))
-                  :size         :regular
-                  :style        {:position "absolute"
-                                 :left     "0.25em"
-                                 :top      "0.25em"}
-                  :on-click     on-select])
-
-
 (defn index-image
+  "Display an image in the photo gallery. A checkmark circle icon allows for selection
+  of the image for use in group actions."
   [path _ _ _]
-  (let [selected?  (subscribe [:images/selected? path])
+  (let [selected?  (subscribe [:selection/contains? path])
         preloaded? (subscribe [:images/preloaded? path])
-        on-select  #(dispatch [:images/toggle-selection path])]
+
+        on-select  #(dispatch [:selection/toggle-id path])]
     (fn [path aspect idx items]
       (when @preloaded?
         [:div.gallery-image
          {:class (when @selected? "active")
-          :style {:position   "relative"
-                  :background "#eeeeee"
-                  :padding    (if @selected? (str "1em " aspect "em") "0")}}
-         [:div {:style {:background "none"}} [selection-icon selected? on-select]]
-         [images/block-image :path path :on-click #(dispatch [:images/open-carousel idx items])]]))))
+          :style {:padding (if @selected? (str "1em " aspect "em") "0")}}
+         [md-icon-button :md-icon-name "zmdi-check-circle"
+                         :class        (str "photo-selection-icon " (when @selected? "active"))
+                         :size         :regular
+                         :on-click     on-select]
+         [images/block-image :path     path
+                             :on-click #(dispatch [:images/open-carousel idx items])]]))))
 
 (def MONTHS
   ["January"

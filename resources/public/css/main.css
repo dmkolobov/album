@@ -131,15 +131,12 @@ body {
     background: #aaa;
 }
 
-.selection-button {
-    color: rgba(0,0,0,0);
-}
 
-.selection-button:hover {
-    color: #aaa;
-}
+/* -------- gallery images -------- */
 
 .gallery-image {
+  position: relative;
+  background: #eeeeee;
   padding: 0;
   transition: padding 75ms ease-in;
 }
@@ -149,7 +146,12 @@ body {
 }
 
 .photo-selection-icon {
-  color: rgba(211,211,211,0.85);
+  position:   absolute;
+  top:        0.25em;
+  left:       0.25em;
+  opacity:    0;
+  background: none;
+  color:      rgba(211,211,211,0.85);
 }
 
 .photo-selection-icon:hover {
@@ -157,5 +159,10 @@ body {
 }
 
 .photo-selection-icon.active {
+  opacity: 1;
   color: #2196f3;
+}
+
+.gallery-image:hover .photo-selection-icon {
+  opacity: 1;
 }

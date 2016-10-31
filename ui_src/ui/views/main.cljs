@@ -26,12 +26,12 @@
 (defn main-toolbar
   [title]
   [base-toolbar :class "main-menu"
-   :logo  [main-menu-button]
-   :left-content [re-com/title :level         :level2
-                               :margin-top    "0px"
-                               :margin-bottom "0px"
-                               :label         title]
-   :right-content [import-button]])
+                :logo  [main-menu-button]
+                :left-content [re-com/title :level         :level2
+                                            :margin-top    "0px"
+                                            :margin-bottom "0px"
+                                            :label         title]
+                :right-content [import-button]])
 
 ;; -------- sidebar --------
 
