@@ -80,12 +80,12 @@
                    (when @sidebar?
                      ^{:key "sidebar"}
                      [v-box :size     "auto"
-                      :class    "sidebar left-sidebar"
-                      :children [[sidebar-logo]
-                                 [box :child [menu :model     current-view
-                                                   :items     sidebar-items
-                                                   :label-fn  label-expanded-sidebar-item
-                                                   :on-change swap-view]]]])]
+                            :class    "sidebar left-sidebar"
+                            :children [[sidebar-logo]
+                                       [box :child [menu :model     current-view
+                                                         :items     sidebar-items
+                                                         :label-fn  label-expanded-sidebar-item
+                                                         :on-change swap-view]]]])]
                   [menu :model     current-view
                         :items     sidebar-items
                         :label-fn  label-sidebar-item

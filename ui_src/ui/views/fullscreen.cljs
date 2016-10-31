@@ -21,5 +21,5 @@
                                  :children [[base-toolbar :class         "fullscreen-toolbar"
                                                           :logo          [return-button on-close]
                                                           :right-content actions]
-                                      content]]
+                                             content]]
                  :sidebar sidebar])

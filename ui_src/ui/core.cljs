@@ -60,6 +60,10 @@
   (fn [db [_ ids]]
     (clojure.set/subset? (set ids) (get db :selection/id-set #{}))))
 
+(reg-sub
+  :selection/count
+  (fn [db] (count (get db :selection/id-set))))
+
 (reg-event-db
   :selection/toggle-id
   (fn [db [_ path]]
@@ -137,8 +141,12 @@
 (defn photos-view
   "Display a gallery of all photos in your Album library."
   []
-  [main-view :title   "Photos"
-             :content [photo-gallery]])
+  (let [selection-count (subscribe [:selection/count])]
+    (fn []
+      [main-view :title   (if (> @selection-count 0)
+                            (str "Photos - " @selection-count)
+                            "Photos")
+                 :content [photo-gallery]])))
 
 (defn albums-view
   "Display a gallery of all albums in your Album library."
