@@ -30,12 +30,12 @@
 
 (defn square-photo
   [path {:keys [aspect] :as info}]
-  [:div {:display        "block"
-         :position       "relative"
-         :width          "0"
-         :height         "100%"
-         :padding-left   (str (* (/ 1 aspect) 100) "%")
-         :margin         "auto"}
+  [:div {:style   {:position       "relative"
+                   :display        "block"
+                   :width          "0"
+                   :height         "100%"
+                   :padding-left   (str (* (/ 1 aspect) 100) "%")
+                   :margin         "auto"}}
    [absolute-image :path path]])
 
 (defn landscape-photo

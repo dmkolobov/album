@@ -40,7 +40,10 @@
     (let [{:keys [items idx]} (get db :images/carousel-state)
           path (nth items idx)
           info (get-in db [:image-info path])]
-      [path info])))
+      [[path info]
+       (= 0 idx)
+       (= (dec (count items))
+          idx)])))
 
 (reg-sub
   :images/info?

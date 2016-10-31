@@ -13,8 +13,8 @@
 
 (defn display-info
   [model]
-  (let [[path info]  @model
-        printed-info (with-out-str (pprint info))]
+  (let [[[path info] _ _]  @model
+        printed-info       (with-out-str (pprint info))]
     ^{:key path}
     [v-box :class    "fullscreen-sidebar"
            :height   "100%"
