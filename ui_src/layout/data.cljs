@@ -6,7 +6,7 @@
 
 (defrecord PaintRect [id x y width height])
 
-(defrecord Layout [rect paint-list]
+(defrecord Layout [id rect paint-list items]
   IWillLayout
 
   (aspect [_]

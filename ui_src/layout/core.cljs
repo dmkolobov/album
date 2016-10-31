@@ -78,14 +78,13 @@
          [paint-layout item-fn @layout])})))
 
 (defn grouped-layout
-  [& {:keys [groups
-             step
+  [& {:keys [groups     ;; (atom)   - a map of [id items]
+             step       ;; (number) - the number of pixels the window can change items are re-layed out.
+             item-gap   ;; (number) - the number of pixels between layout items
+             group-gap  ;; (number) - the number of pixels between layouts
 
-             item-gap
-             group-gap
-
-             group-fn
-             item-fn]
+             group-fn   ;; (fn [id items rendered-layout] ...)
+             item-fn]   ;; (fn [id aspect idx items] ...)  <--- WTF??? 'idx' and 'items' gotta go.
       :or {step 100
            item-gap 0
            group-gap 5}}]

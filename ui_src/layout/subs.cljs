@@ -129,8 +129,9 @@
             (let [paint-list (persistent! paint-list)
                   height     (+ y height)]
               (map->Layout
-              {:rect       {:width width :height height}
-               :paint-list paint-list}))))))
+               {:rect       {:width width :height height}
+                :paint-list paint-list
+                :items      (map :id paint-list)}))))))
 
 ;; subscriptions
 
@@ -206,8 +207,7 @@
                groups)))
 
   (fn [[scale-rect & row-groups] [_ _ item-gap group-gap] [groups]]
-    (let [layout-groups (map (fn [layout id items] (assoc layout :id id :items items))
+    (let [layout-groups (map (fn [layout id items] (assoc layout :id id))
                              (map #(scale-rows scale-rect % item-gap) row-groups)
-                             (keys groups)
-                             (vals groups))]
+                             (keys groups))]
       (clump-layouts scale-rect group-gap layout-groups))))

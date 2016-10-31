@@ -26,7 +26,9 @@
             [ui.controls.subs]
 
             [ui.views.carousel :refer [carousel]]
-            [ui.views.info :refer [display-info info-button]]))
+            [ui.views.info :refer [display-info info-button]]
+
+            [ui.util :refer [date-string]]))
 
 (enable-console-print!)
 
@@ -62,7 +64,7 @@
                             (disj s path)
                             (conj s path))))))
 
-(defn index-image
+(defn gallery-image
   "Display an image in the photo gallery. A checkmark circle icon allows for selection
   of the image for use in group actions."
   [path _ _ _]
@@ -82,28 +84,8 @@
          [images/block-image :path     path
                              :on-click #(dispatch [:images/open-carousel idx items])]]))))
 
-(def MONTHS
-  ["January"
-   "February"
-   "March"
-   "April"
-   "May"
-   "June"
-   "July"
-   "August"
-   "September"
-   "October"
-   "November"
-   "December"])
 
-(defn date-string
-  [date]
-  (let [year  (.getFullYear date)
-        month (get MONTHS (.getMonth date))
-        day   (.getDate date)]
-    (str month " " day ", " year)))
-
-(defn gallery
+(defn gallery-group
   [date items layout]
   [v-box :size     "none"
          :gap      "1em"
@@ -118,9 +100,9 @@
     (fn []
       [grouped-layout :groups    by-date
                       :item-gap  5
-                      :item-fn   index-image
+                      :item-fn   gallery-image
                       :group-gap 50
-                      :group-fn  gallery])))
+                      :group-fn  gallery-group])))
 
 (defn photos-view
   "Display a gallery of all photos in your Album library."
