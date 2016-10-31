@@ -110,7 +110,7 @@
     (str month " " day ", " year)))
 
 (defn gallery
-  [date layout]
+  [date items layout]
   [v-box :size     "none"
          :gap      "1em"
          :children [[title :label (date-string date)

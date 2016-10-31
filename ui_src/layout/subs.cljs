@@ -206,7 +206,8 @@
                groups)))
 
   (fn [[scale-rect & row-groups] [_ _ item-gap group-gap] [groups]]
-    (let [layout-groups (map #(assoc %2 :id %1)
+    (let [layout-groups (map (fn [layout id items] (assoc layout :id id :items items))
+                             (map #(scale-rows scale-rect % item-gap) row-groups)
                              (keys groups)
-                             (map #(scale-rows scale-rect % item-gap) row-groups))]
+                             (vals groups))]
       (clump-layouts scale-rect group-gap layout-groups))))
