@@ -74,10 +74,9 @@
 
 
 (defn index-image
-  [path _ idx items]
+  [path _ _ _]
   (let [selected?  (subscribe [:images/selected? path])
         preloaded? (subscribe [:images/preloaded? path])
-        on-click   #(dispatch [:images/open-carousel idx items])
         on-select  #(dispatch [:images/toggle-selection path])]
     (fn [path aspect idx items]
       (when @preloaded?
@@ -87,7 +86,7 @@
                   :background "#eeeeee"
                   :padding    (if @selected? (str "1em " aspect "em") "0")}}
          [:div {:style {:background "none"}} [selection-icon selected? on-select]]
-         [images/block-image :path path :on-click on-click]]))))
+         [images/block-image :path path :on-click #(dispatch [:images/open-carousel idx items])]]))))
 
 (def MONTHS
   ["January"
