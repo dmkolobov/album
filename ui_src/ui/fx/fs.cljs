@@ -13,7 +13,6 @@
              (if err
                (dispatch (conj on-error (js->clj err)))
                (dispatch (conj on-success
-                               path
                                {:filesize      (.-size val)
                                 :last-modified (.-mtime val)})))))))
 

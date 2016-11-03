@@ -36,7 +36,6 @@
                  (if err
                    (dispatch (conj on-error path (js->clj err)))
                    (dispatch (conj on-success
-                                   path
                                    (process-image-data val))))))))
 
 (reg-fx-service

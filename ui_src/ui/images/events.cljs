@@ -16,7 +16,7 @@
 (reg-event-db
   :image/store-info
   [trim-v]
-  (fn [db [path [_ _ _ info]]]
+  (fn [db [path [_ _ info]]]
     (update-in db
                [:image-info path]
                (fn [image]
