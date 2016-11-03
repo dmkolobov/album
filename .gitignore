@@ -6,3 +6,4 @@ node_modules/
 *-init.clj
 figwheel_server.log
 .idea
+run

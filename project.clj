@@ -11,7 +11,9 @@
                  [album-layout "0.1.3"]
                  [ring/ring-core "1.4.0"]
                  [com.cognitect/transit-cljs "0.8.239"]
-                 [day8.re-frame/async-flow-fx "0.1.2-DEV"]]
+                 [day8.re-frame/async-flow-fx "0.1.2-DEV"]
+                 [datascript "0.15.4"]
+                 [posh "0.5.4"]]
   :plugins [[lein-cljsbuild "1.1.1"]
             [lein-figwheel "0.5.2"]]
 
@@ -21,7 +23,16 @@
                                     "resources/public/js/ui-out"]
   :cljsbuild
   {:builds
-   [{:source-paths ["electron_src"]
+   [{:source-paths ["test" "ui_src"]
+     :id           "ui-test"
+     :compiler     {:optimizations  :none
+                    :pretty-print   true
+                    :cache-analysis true
+                    :output-to      "run/compiled/browser/test.js"
+                    :source-map     true
+                    :output-dir     "run/compiled/browser/test"}}
+
+    {:source-paths ["electron_src"]
      :id "electron-dev"
      :compiler {:output-to "resources/main.js"
                 :optimizations :simple
