@@ -13,9 +13,9 @@
             [ui.fx.img]
             [ui.fx.main-thread]
 
-            [ui.images.events]
-            [ui.images.subs]
-            [ui.images.views :as images]
+            [ui.images.photos]
+            [ui.images.photos]
+            [ui.images.images :as images]
 
             [ui.views.common.toolbar :refer [base-toolbar]]
             [ui.views.main :refer [main-view]]
@@ -23,9 +23,9 @@
 
             [ui.controls.views :as controls]
             [ui.controls.events]
-            [ui.controls.subs]
+            [ui.controls.controls]
 
-            [ui.views.carousel :refer [carousel]]
+            [ui.views.slideshow :refer [carousel]]
             [ui.views.info :refer [display-info info-button]]
 
             [ui.util :refer [date-string]]))
@@ -35,12 +35,12 @@
 (defn carousel-view
   "Display photo results in a full-screen carousel view."
   []
-  (let [cursor     (subscribe [:images/cursor])
-        info?      (subscribe [:images/info?])
+  (let [cursor     (subscribe [:lib.slideshow/current-id])
+        info?      (subscribe [:lib.controls/photo-info?])
 
-        on-rewind  #(dispatch [:images/rewind-carousel])
-        on-advance #(dispatch [:images/advance-carousel])
-        on-close   #(dispatch [:images/close-carousel])]
+        on-rewind  #(dispatch [:lib.slideshow/rewind])
+        on-advance #(dispatch [:lib.slideshow/advance])
+        on-close   #(dispatch [:lib.slideshow/close])]
     (fn []
       [fullscreen-view :on-close on-close
                        :actions  [info-button]
@@ -50,49 +50,9 @@
                                            :on-advance on-advance
                                            :render-fn  images/fullscreen-photo]])))
 
-(reg-sub
-  :selection/contains?
-  (fn [db [_ id]]
-    (contains? (get db :selection/id-set) id)))
-
-(reg-sub
-  :selection/contains-all?
-  (fn [db [_ ids]]
-    (clojure.set/subset? (set ids) (get db :selection/id-set #{}))))
-
-(reg-sub
-  :selection/count
-  (fn [db] (count (get db :selection/id-set))))
-
-(reg-event-db
-  :selection/toggle-id
-  (fn [db [_ path]]
-    (let [s (get db :selection/id-set #{})]
-      (assoc db
-        :selection/id-set (if (contains? s path)
-                            (disj s path)
-                            (conj s path))))))
-
-(reg-event-db
-  :selection/include-ids
-  (fn [db [_ ids]]
-    (update db
-            :selection/id-set
-            (fn [id-set]
-              (if id-set (into id-set ids) (set ids))))))
-
-(reg-event-db
-  :selection/exclude-ids
-  (fn [db [_ ids]]
-    (apply update db :selection/id-set disj ids)))
-
-(reg-event-db
-  :selection/discard
-  (fn [db] (dissoc db :selection/id-set)))
-
 (defn group-header
   [label ids]
-  (let [selected? (subscribe [:selection/contains-all? ids])]
+  (let [selected? (subscribe [:lib.selection/contains-all? ids])]
     (fn [label ids]
       [h-box
        :align     :center
@@ -101,8 +61,8 @@
                                   :md-icon-name "zmdi-check-circle"
                                   :size         :regular
                                   :on-click    (if @selected?
-                                                 #(dispatch [:selection/exclude-ids ids])
-                                                 #(dispatch [:selection/include-ids ids]))]
+                                                 #(dispatch [:lib.selection/exclude-ids ids])
+                                                 #(dispatch [:lib.selection/include-ids ids]))]
                   [title :class "gallery-title"
                          :label label
                          :level :level3]]])))
@@ -115,29 +75,31 @@
                     [box :size  "auto"
                          :child layout]]])
 
+(defn gallery-photo
+  [photo-id idx items]
+  (let []
+    (fn [_]
+      ())))
+
 (defn gallery-image
   "Display an image in the photo gallery. A checkmark circle icon allows for selection
   of the image for use in group actions."
-  [path _ _ _]
-  (let [selected?  (subscribe [:selection/contains? path])
-        preloaded? (subscribe [:images/preloaded? path])
-
-        on-select  #(dispatch [:selection/toggle-id path])]
-    (fn [path aspect idx items]
-      (when @preloaded?
-        [:div.gallery-image
-         {:class (when @selected? "active")
-          :style {:padding (if @selected? (str "1em " aspect "em") "0")}}
-         [md-icon-button :md-icon-name "zmdi-check-circle"
-                         :class        (str "photo-selection-icon " (when @selected? "active"))
-                         :size         :regular
-                         :on-click     on-select]
-         [images/block-image :path     path
-                             :on-click #(dispatch [:images/open-carousel idx items])]]))))
+  [photo-id _ _ _]
+  (let [selected?  (subscribe [:lib.selection/contains? photo-id])
+        on-select  #(dispatch [:lib.selection/toggle-id photo-id])]
+    (fn [photo-id aspect idx items]
+      [:div.gallery-image
+       {:class (when @selected? "active")
+        :style {:padding (if @selected? (str "1em " aspect "em") "0")}}
+       [md-icon-button :md-icon-name "zmdi-check-circle"
+                       :class        (str "photo-selection-icon " (when @selected? "active"))
+                       :size         :regular
+                       :on-click     on-select]
+       [gallery-photo photo-id idx items]])))
 
 (defn photo-gallery
   []
-  (let [by-date (subscribe [:images/by-date])]
+  (let [by-date (subscribe [:lib.photos/by-date])]
     (fn []
       [grouped-layout :groups    by-date
                       :item-gap  5
@@ -145,22 +107,15 @@
                       :group-gap 50
                       :group-fn  gallery-group])))
 
-(defn group-info-button
-  []
-  [md-icon-button :md-icon-name "zmdi-info"
-                  :size         :regular
-                  :on-click     #(dispatch [:images/open-multiple-info])])
-
 (defn photos-view
   "Display a gallery of all photos in your Album library."
   []
-  (let [selection-count (subscribe [:selection/count])]
+  (let [selection-count (subscribe [:lib.selection/count])]
     (fn []
       [main-view :title   (if (> @selection-count 0)
                             (str "Photos - " @selection-count)
                             "Photos")
-                 :content [photo-gallery]
-                 :select-actions [group-info-button]])))
+                 :content [photo-gallery]])))
 
 (defn albums-view
   "Display a gallery of all albums in your Album library."
@@ -175,7 +130,7 @@
 
 (defn root-component
   []
-  (let [current-view (subscribe [:controls/current-view])]
+  (let [current-view (subscribe [:lib.controls/current-view])]
     (fn []
       [(get views @current-view)])))
 

@@ -1,21 +1,25 @@
 (ns data.core
-  (:require [re-frame.core :refer [reg-sub reg-event-db trim-v]]
+  (:require [re-frame.core :refer [reg-sub reg-event-db trim-v subscribe]]
+            [reagent.ratom :refer [make-reaction]]
             [datascript.core :refer [with]]
             [datascript.core :as datascript]))
 
-(defn enqueue
-  "Enqueue a sequence of transaction maps, to be applied
-  the next time ::flush is dispatched."
-  [db tx-data]
-    (update db ::transaction into tx-data))
+(defn get-db [db]   (get db ::db))
+(defn set-db [db v] (assoc db ::db v))
 
-(defn flush-transaction
+(defn transact
   "Applies the stored transaction datato the datascript database at
   ::db and stores the :db-after value of the report."
-  [db]
-  (let [tx-report (datascript/with (get db ::db)
-                                   (get db ::transaction))]
-    (assoc db ::db (:db-after tx-report))))
+  [db tx-data]
+  (let [tx-report (datascript/with (get-db db) tx-data)]
+    (set-db db (:db-after tx-report))))
 
-(reg-event-db ::enqueue [trim-v] enqueue)
-(reg-event-db ::flush   [trim-v] flush-transaction)
+(reg-event-db ::transact [trim-v] transact)
+
+(reg-sub ::db get-db)
+
+(defn query-db
+  [query]
+  (let [db (subscribe [::db])]
+    (make-reaction
+      (fn [] (datascript/q query @db)))))

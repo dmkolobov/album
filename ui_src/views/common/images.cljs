@@ -1,4 +1,4 @@
-(ns ui.images.views
+(ns ui.views.images
   (:require [re-frame.core :refer [subscribe]]
             [re-com.core :refer [box throbber]]))
 
@@ -26,10 +26,8 @@
                               :z-index    1}}
                      (when on-click {:on-click on-click}))])
 
-;; ---- fullscreen photos ----
-
-(defn square-photo
-  [path {:keys [aspect] :as info}]
+(defn square
+  [path aspect]
   [:div {:style   {:position       "relative"
                    :display        "block"
                    :width          "0"
@@ -38,15 +36,15 @@
                    :margin         "auto"}}
    [absolute-image :path path]])
 
-(defn landscape-photo
-  [path info]
+(defn landscape
+  [path _]
   [box :size   "100%"
        :height "100%"
        :align  :center
        :child  [absolute-image :path path]])
 
-(defn portrait-photo
-  [path {:keys [aspect] :as info}]
+(defn portrait
+  [path aspect]
   [:div {:display        "block"
          :position       "relative"
          :width          "0"
@@ -55,8 +53,8 @@
          :margin         "auto"}
    [absolute-image :path path]])
 
-(defn fullscreen-photo
-  [path {:keys [aspect] :as info}]
-  (cond  (= aspect 1) [square-photo path info]
-         (> aspect 1) [landscape-photo path info]
-         (< aspect 1) [portrait-photo path info]))
+(defn image
+  [path aspect]
+  (cond (= aspect 1) [square path aspect]
+        (> aspect 1) [landscape path aspect]
+        (< aspect 1) [portrait path aspect]))

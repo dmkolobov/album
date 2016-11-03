@@ -1,5 +1,5 @@
-(ns ui.async-util
-  (:require [re-frame.core :refer [reg-fx debug dispatch reg-event-fx reg-event-db trim-v]]
+(ns lib.util
+  (:require [re-frame.core :refer [reg-fx debug dispatch reg-event-fx reg-event-db trim-v reg-sub]]
             [cljs.pprint :refer [pprint]]))
 
 (def async-action
@@ -32,3 +32,12 @@
     [async-action trim-v]
     (fn [{:keys [on-success on-error]} [args]]
       {fx-id (assoc args :on-success on-success :on-error on-error)})))
+
+(defn success-ev [e] [:async/success e])
+(defn error-ev   [e] [:async/error e])
+
+(defn db-flag
+  [key on off]
+  (reg-event-db on                   #(assoc  %1 key true))
+  (reg-event-db off                  #(dissoc %1 key))
+  (reg-sub      (keyword (name key)) #(get    %1 key)))

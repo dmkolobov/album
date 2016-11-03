@@ -1,6 +1,6 @@
 (ns ui.fx.fs
   (:require [re-frame.core :refer [dispatch]]
-            [ui.async-util :refer [reg-fx-service]]))
+            [lib.util :refer [reg-fx-service]]))
 
 (defonce fs (js/require "fs-extra"))
 
@@ -12,9 +12,7 @@
            (fn [err val]
              (if err
                (dispatch (conj on-error (js->clj err)))
-               (dispatch (conj on-success
-                               {:filesize      (.-size val)
-                                :last-modified (.-mtime val)})))))))
+               (dispatch (conj on-success {:filesize (.-size val)})))))))
 
 (reg-fx-service
   :fs/copy

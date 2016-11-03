@@ -1,7 +1,7 @@
 (ns ui.fx.img
   (:require [re-frame.core :refer [dispatch]]
             [clojure.string :refer [split join]]
-            [ui.async-util :refer [reg-fx-service]]))
+            [lib.util :refer [reg-fx-service]]))
 
 (defonce gm (js/require "gm"))
 
@@ -18,8 +18,8 @@
   (let [{:keys [width height] :as size} (js->clj data.size :keywordize-keys true)
         exif                            (aget data "Profile-EXIF")
         now                             (js/Date.)]
-    {:size      size
-     :aspect   (/ width height)
+    {:width    width
+     :height   height
      :taken-at (if exif
                  (if-let [taken-at (aget exif "Date Time Original")]
                    (if (string? taken-at)

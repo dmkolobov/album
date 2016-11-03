@@ -1,4 +1,4 @@
-(ns ui.views.main
+(ns views.pages.main
   (:require [re-com.core :as re-com :refer [box hyperlink title h-box v-box scroller md-icon-button]]
             [re-frame.core :refer [dispatch subscribe]]
             [ui.views.common.toolbar :refer [base-toolbar]]
@@ -88,8 +88,8 @@
 
 (defn sidebar
   []
-  (let [current-view (subscribe [:controls/current-view])
-        sidebar?     (subscribe [:controls/sidebar-left?])
+  (let [current-view (subscribe [:lib.controls/current-view])
+        main-menu?   (subscribe [:lib.controls/main-menu?])
         swap-view    #(dispatch [:controls/set-view %])]
     (fn []
       [h-box :padding "1em 0"
@@ -97,7 +97,7 @@
                    {:transition-name           "sidebar"
                     :transition-enter-timeout  100
                     :transition-leave-timeout  100}
-                   (when @sidebar?
+                   (when @main-menu?
                      ^{:key "sidebar"}
                      [v-box :size     "auto"
                             :class    "sidebar left-sidebar"

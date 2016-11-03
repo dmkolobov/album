@@ -1,6 +1,6 @@
 (ns layout.subs
   (:require [re-frame.core :refer [reg-sub subscribe]]
-            [layout.data :refer [aspect map->PaintRect map->Layout]]))
+            [layout.data :refer [map->PaintRect map->Layout]]))
 
 (defn selector
   [key-fn coll]
@@ -24,14 +24,14 @@
 ;; This base rect is only updated when the window width is scaled
 ;; more than some threshold.
 
-(defn item-weight [item] (* 100 (aspect (second item))))
+(defn item-weight [item] (* 100 (second item)))
 
 (defn compute-partitions
   "Partition the provided items into 'n' rows, where 'n' depends on
   'photos-per-screen', and each row has an approximately equal sum of
   aspect ratios."
   [rect items]
-  (let [aspects (map (comp aspect second) items)
+  (let [aspects (map second items)
         n       (num-rows rect aspects)]
     (linear-partition (clj->js (map #(* 100 %) aspects))
                       n)))
@@ -48,7 +48,7 @@
       (doall (map #(map select %) partitions))
       [items])))
 
-(defn row-aspect [row] (reduce + (map (comp aspect second) row)))
+(defn row-aspect [row] (reduce + (map second row)))
 
 ;; The rows are scaled using a different window rect. This window rect
 ;; always reflects the size of the current window.
@@ -103,8 +103,8 @@
            rows       rows
            paint-list (transient [])]
       (cond (seq row)
-            (let [[id item]  (first row)
-                  item-width (* (aspect item) height)
+            (let [[id aspect]  (first row)
+                  item-width (* aspect height)
                   item-end   (+ x item-width)
                   rect       (map->PaintRect
                                {:id     id

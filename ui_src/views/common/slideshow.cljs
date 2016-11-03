@@ -1,17 +1,17 @@
-(ns ui.views.carousel
+(ns ui.views.slideshow
   (:require [re-com.core :refer [md-circle-icon-button h-box box]]))
 
-(defn carousel-left
+(defn slideshow-left
   [on-click]
   [md-circle-icon-button :md-icon-name "zmdi-chevron-left"
                          :on-click     on-click])
 
-(defn carousel-right
+(defn slideshow-right
   [on-click]
   [md-circle-icon-button :md-icon-name "zmdi-chevron-right"
                          :on-click     on-click])
 
-(defn carousel
+(defn slideshow
   [& {:keys [model on-advance on-rewind render-fn]}]
   (let [[[id info] first? last?] @model]
     ^{:key id}
@@ -27,7 +27,7 @@
                              :style   {:position "absolute"
                                        :left     "0"}
                              :attr {:on-click  on-rewind}
-                             :child   [carousel-left on-rewind]])
+                             :child   [slideshow-left on-rewind]])
 
                       [box :size   "auto"
                            :height "100%"
@@ -41,4 +41,4 @@
                              :style   {:position "absolute"
                                        :right     "0"}
                              :attr {:on-click on-advance}
-                             :child   [carousel-right on-advance]])]]))
+                             :child   [slideshow-right on-advance]])]]))
