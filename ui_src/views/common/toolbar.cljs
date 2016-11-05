@@ -5,19 +5,35 @@
 
 (defn px [x] (str x "px"))
 
-(defn action
-  [& {:keys [icon label position emphasis? on-click]}]
-  [box :class (str "action-button " (when emphasis? "emphasis"))
-       :child [md-icon-button :md-icon-name     icon
-                              :tooltip          label
-                              :tooltip-position position
-                              :on-click         on-click]])
-
 (def ribbon-gap
   (px (* 1.5 app-gap)))
 
 (def ribbon-padding
   (str (px app-gap) " " ribbon-gap))
+
+(defn icon-button
+  [& {:keys [icon label position emphasise? on-click]}]
+  [box :class (str "action-button " (when emphasise? "emphasis"))
+       :child [md-icon-button :md-icon-name     icon
+                              :tooltip          label
+                              :tooltip-position position
+                              :on-click         on-click]])
+
+(defn menu-button
+  [& {:keys [icon label emphasise? on-click]}]
+  [h-box :class    (str "nav-button"
+                        (when emphasise?
+                          " active"))
+         :gap      ribbon-gap
+         :padding  ribbon-padding
+         :width    "100%"
+         :align    :center
+         :children [[:i.zmdi {:class icon}]
+                    [re-com/title :label         label
+                                  :level         :level3
+                                  :margin-top    "0px"
+                                  :margin-bottom "0px"]]
+         :attr     {:on-click on-click}])
 
 (defn navbar
   [& {:keys [class
@@ -38,11 +54,11 @@
          :padding  ribbon-padding
          :children (doall
                      (map (fn [act]
-                            [action :icon      (icon-fn act)
-                                    :label     (label-fn act)
-                                    :position  :right-center
-                                    :emphasis? (= (id-fn act) @model)
-                                    :on-click  #(on-change act)])
+                            [icon-button :icon      (icon-fn act)
+                                         :label     (label-fn act)
+                                         :position  :right-center
+                                         :emphasise? (= (id-fn act) @model)
+                                         :on-click  #(on-change act)])
                           @actions))])
 
 (defn navmenu
@@ -63,19 +79,10 @@
          :children (doall
                      (map (fn [act]
                             ^{:key (id-fn act)}
-                            [h-box :class    (str "nav-button"
-                                                  (when (= @model (id-fn act))
-                                                    " active"))
-                                   :gap      ribbon-gap
-                                   :padding  ribbon-padding
-                                   :width    "100%"
-                                   :align    :center
-                                   :children [[:i.zmdi {:class (icon-fn act)}]
-                                              [re-com/title :label         (label-fn act)
-                                                            :level         :level3
-                                                            :margin-top    "0px"
-                                                            :margin-bottom "0px"]]
-                                   :attr {:on-click #(on-change act)}])
+                            [menu-button :icon       (icon-fn act)
+                                         :label      (label-fn act)
+                                         :emphasise? (= @model (id-fn act))
+                                         :on-click   #(on-change act)])
                           @actions))])
 
 (defn toolbar
@@ -100,10 +107,10 @@
          :padding  ribbon-padding
          :align    :center
          :children (into
-                     [[action :icon     nav-icon
-                            :label    nav-tooltip
-                            :position :below-right
-                            :on-click on-nav]
+                     [[icon-button :icon     nav-icon
+                                   :label    nav-tooltip
+                                   :position :below-right
+                                   :on-click on-nav]
                       [box :size  "auto"
                            :child [re-com/title :label         title
                                                 :margin-top    "0px"
@@ -112,9 +119,9 @@
                      (doall
                       (map (fn [act]
                              ^{:key (action-id-fn act)}
-                             [action :icon     (action-icon-fn act)
-                                     :label    (action-label-fn act)
-                                     :position :below-center
-                                     :on-click #(on-action act)])
+                             [icon-button :icon     (action-icon-fn act)
+                                          :label    (action-label-fn act)
+                                          :position :below-center
+                                          :on-click #(on-action act)])
                            @actions)))])
 ;;
