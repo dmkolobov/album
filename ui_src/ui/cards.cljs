@@ -28,7 +28,8 @@
 (defn toggle-sidebar! [] (swap! sidebar? not))
 (defn navigate! [{:keys [id]}] (reset! model id))
 
-(def app-bar
+(defn app-bar
+  []
   [toolbar/toolbar :nav-icon    "zmdi-menu"
                    :nav-tooltip "Main menu"
                    :title       "Hello, World"
@@ -36,29 +37,32 @@
                    :on-nav      toggle-menu!
                    :on-action   toggle-sidebar!])
 
-(def app-nav-bar
+(defn app-nav-bar
+  []
   [toolbar/navbar :actions     actions
                   :model       model
                   :on-change   navigate!])
 
-(def app-nav-menu
+(defn app-nav-menu
+  []
   [re-com/box :child [toolbar/navmenu :actions     actions
                                       :model       model
                                       :on-change   navigate!]])
 
-(def app-content
-  [re-com/h-box :children [app-nav-bar
+(defn app-content
+  []
+  [re-com/h-box :children [[app-nav-bar]
                            [box :child [:div "hello, world"]]]])
 
-(defcard bar (reagent/as-element app-bar))
-(defcard nav-bar (reagent/as-element [box :child app-nav-bar]))
-(defcard nav-menu (reagent/as-element [box :child app-nav-menu]))
+(defcard bar (reagent/as-element [app-bar]))
+(defcard nav-bar (reagent/as-element [box :child [app-nav-bar]]))
+(defcard nav-menu (reagent/as-element [box :child [app-nav-menu]]))
 
 (defn main-structure
   []
-  [struct/main :app-bar   app-bar
-               :side-nav  (when @menu? app-nav-menu)
-               :content   app-content
+  [struct/main :app-bar   [app-bar]
+               :side-nav  (when @menu? [app-nav-menu])
+               :content   [app-content]
                :right-nav (when @sidebar?
                             [box :child "foobar"])
                :attr      (when @menu?

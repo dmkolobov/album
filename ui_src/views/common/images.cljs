@@ -35,12 +35,12 @@
 
 (defn portrait
   [path aspect]
-  [:div {:display        "block"
+  [:div {:style {:display        "block"
          :position       "relative"
          :width          "0"
          :height         "100%"
          :padding-left    (str (* aspect 100) "%")
-         :margin         "auto"}
+         :margin         "auto"}}
    [absolute-image :path path]])
 
 (defn image
