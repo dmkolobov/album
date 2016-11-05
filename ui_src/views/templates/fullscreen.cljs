@@ -1,7 +1,7 @@
 (ns views.pages.fullscreen
   (:require [re-com.core :refer [box h-box v-box md-icon-button]]
             [re-frame.core :refer [dispatch]]
-            [ui.views.common.toolbar]
+            [ui.views.common.toolbar :refer [toolbar]]
             [ui.views.common.sidebar :refer [sidebar-split]]))
 
 (defn return-button
@@ -18,7 +18,7 @@
                  :content [v-box :size     "auto"
                                  :height   "100%"
                                  :style    {:position "relative"}
-                                 :children [[base-toolbar :class         "fullscreen-toolbar"
+                                 :children [[toolbar :class         "fullscreen-toolbar"
                                                           :logo          [return-button on-close]
                                                           :right-content actions]
                                              content]]

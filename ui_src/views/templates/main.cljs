@@ -1,7 +1,6 @@
 (ns views.pages.main
   (:require [re-com.core :as re-com :refer [box hyperlink title h-box v-box scroller md-icon-button]]
             [re-frame.core :refer [dispatch subscribe]]
-            [ui.views.common.toolbar :refer [base-toolbar]]
             [ui.views.common.menu :refer [menu]]
             [reagent.core :as reagent]))
 
