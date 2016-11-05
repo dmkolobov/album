@@ -26,6 +26,7 @@
                 :label "yes, indeed!"}]
       on-action (comp println vector :id)
       on-nav    (partial println "toolbar nav")]
+
 (defcard basic-toolbar
          (reagent/as-element
            [toolbar/toolbar :class       "shadow-1"

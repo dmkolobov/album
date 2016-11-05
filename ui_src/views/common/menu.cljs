@@ -16,5 +16,5 @@
        ^{:key (id-fn item)}
        [:li.list-group-item
         {:class    (when (= (id-fn item) @model) "active")
-         :on-click #(on-change (id-fn item))}
+         :on-click #(on-change item)}
         (label-fn item)]))])

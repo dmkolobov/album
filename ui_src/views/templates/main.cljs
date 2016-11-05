@@ -2,6 +2,7 @@
   (:require [re-com.core :as re-com :refer [box hyperlink title h-box v-box scroller md-icon-button]]
             [re-frame.core :refer [dispatch subscribe]]
             [ui.views.common.menu :refer [menu]]
+            [ui.views.common.toolbar :refer [toolbar]]
             [reagent.core :as reagent]))
 
 ;; -------- toolbar --------
@@ -24,7 +25,7 @@
 
 (defn main-toolbar*
   [title]
-  [base-toolbar :class "main-menu"
+  [toolbar :class "main-menu"
                 :logo  [main-menu-button]
                 :left-content [re-com/title :level         :level2
                                             :margin-top    "0px"
@@ -43,7 +44,7 @@
   (let [selection-count (subscribe [:selection/count])]
     (fn [& {:keys [title select-actions]}]
       (if (> @selection-count 0)
-        [base-toolbar :class        "selection-menu"
+        [toolbar :class        "selection-menu"
                       :logo         [unselect-button]
                       :left-content [re-com/title :label (str @selection-count " selected")
                                                   :margin-top    "0px"
