@@ -20,7 +20,11 @@
 (defonce menu?
   (atom false))
 
-(defn toggle-menu! [] (println (swap! menu? not)))
+(defonce sidebar?
+  (atom false))
+
+(defn toggle-menu! [] (swap! menu? not))
+(defn toggle-sidebar! [] (swap! sidebar? not))
 (defn navigate! [{:keys [id]}] (reset! model id))
 
 (def app-bar
@@ -29,7 +33,7 @@
                    :title       "Hello, World"
                    :actions     actions
                    :on-nav      toggle-menu!
-                   :on-action   println])
+                   :on-action   toggle-sidebar!])
 
 (def app-nav-bar
   [toolbar/navbar :actions     actions
@@ -54,7 +58,8 @@
   [struct/main :app-bar   app-bar
                :side-nav  (when @menu? app-nav-menu)
                :content   app-content
-               :right-nav [box :child "foobar"]
+               :right-nav (when @sidebar?
+                            [box :child "foobar"])
                :attr      (when @menu?
                             {:on-click toggle-menu!})])
 
