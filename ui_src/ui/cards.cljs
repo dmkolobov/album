@@ -67,9 +67,12 @@
 (defcard layout (reagent/as-element [main-structure]))
 
 (def test-images
-  [["img/fix/fire_pit.jpg"  (/ 1024 683)]
-   ["img/fix/good_deal.jpg" (/ 826 826)]
-   ["img/fix/see_saw.jpg"   (/ 1024 1536)]])
+  [["img/fix/fire_pit.jpg"    (/ 1024 683)]
+   ["img/fix/good_deal.jpg"   (/ 826 826)]
+   ["img/fix/see_saw.jpg"     (/ 1024 1536)]
+   ["img/fix/jackhammer.jpg"  (/ 200 200)]
+   ["img/fix/death_truck.jpg" (/ 200 150)]
+   ["img/fix/fire_stick.jpg"  (/ 133 200)]])
 
 (defn framed-image
   [entry frame-size]
@@ -81,14 +84,11 @@
 
 (def frames [100 250 500])
 
-(defn frame-set
-  [entry]
-  [h-box :gap      "16px"
-         :align    :center
-         :children (map #(conj [framed-image entry] %) frames)])
-
 (defcard responsive-images
          (reagent/as-element
            [v-box :gap      "16px"
-                  :children (map #(vector frame-set %)
+                  :children (map (fn [entry]
+                                   [h-box :gap      "16px"
+                                          :align    :center
+                                          :children (map #(conj [framed-image entry] %) frames)])
                                  test-images)]))
