@@ -13,21 +13,6 @@
             [ui.fx.img]
             [ui.fx.main-thread]
 
-            [ui.images.photos]
-            [ui.images.photos]
-            [ui.images.images :as images]
-
-            [ui.views.common.toolbar :refer [base-toolbar]]
-            [ui.views.main :refer [main-view]]
-            [ui.views.fullscreen :refer [fullscreen-view]]
-
-            [ui.controls.views :as controls]
-            [ui.controls.events]
-            [ui.controls.controls]
-
-            [ui.views.slideshow :refer [carousel]]
-            [ui.views.info :refer [display-info info-button]]
-
             [ui.util :refer [date-string]]))
 
 (enable-console-print!)

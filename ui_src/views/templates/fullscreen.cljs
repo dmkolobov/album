@@ -1,7 +1,7 @@
 (ns views.pages.fullscreen
   (:require [re-com.core :refer [box h-box v-box md-icon-button]]
             [re-frame.core :refer [dispatch]]
-            [ui.views.common.toolbar :refer [base-toolbar]]
+            [ui.views.common.toolbar]
             [ui.views.common.sidebar :refer [sidebar-split]]))
 
 (defn return-button

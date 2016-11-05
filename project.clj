@@ -4,6 +4,7 @@
   :dependencies [[org.clojure/clojure "1.8.0"]
                  [org.clojure/clojurescript "1.8.40"]
                  [figwheel "0.5.2"]
+                 [devcards "0.2.2"]
                  [reagent "0.6.0-rc" :exclusions [cljsjs/react]]
                  [cljsjs/react-with-addons "15.2.1-0"]
                  [re-frame "0.8.1"]
@@ -23,7 +24,15 @@
                                     "resources/public/js/ui-out"]
   :cljsbuild
   {:builds
-   [{:source-paths ["test" "ui_src"]
+   [{:id           "devcards"
+     :source-paths ["ui_src"]
+     :figwheel     {:devcards   true}
+     :compiler     {:main       "ui.cards"
+                    :asset-path "js/devcards_out"
+                    :output-to  "resources/public/js/album_devcards.js"
+                    :output-dir "resources/public/js/devcards_out"
+                    :source-map-timestamp true}}
+    {:source-paths ["test" "ui_src"]
      :id           "ui-test"
      :compiler     {:optimizations  :none
                     :pretty-print   true
