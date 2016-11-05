@@ -13,26 +13,23 @@
                          :size         :regular
                          :on-click     identity])
 
-(let [actions [{:id    :foo
-                :icon  "zmdi-book"
-                :label "foobar"}
-
-               {:id    :bar
-                :icon  "zmdi-cake"
-                :label "hello, world"}
-
-               {:id    :car
-                :icon  "zmdi-cocktail"
-                :label "yes, indeed!"}]
+(let [actions   [{:id :book     :icon "zmdi-book"     :label "book"}
+                 {:id :cake     :icon "zmdi-cake"     :label "cake"}
+                 {:id :cocktail :icon "zmdi-cocktail" :label "cocktail"}]
       on-action (comp println vector :id)
       on-nav    (partial println "toolbar nav")]
 
-(defcard basic-toolbar
+(defcard toolbar
          (reagent/as-element
-           [toolbar/toolbar :class       "shadow-1"
-                            :nav         "zmdi-menu"
+           [toolbar/toolbar :nav-icon    "zmdi-menu"
                             :nav-tooltip "Main menu"
                             :title       "Hello, World"
                             :actions     actions
                             :on-nav      on-nav
-                            :on-action   on-action])))
+                            :on-action   on-action]))
+
+(defcard navbar
+         (reagent/as-element
+           [re-com/box :child [toolbar/navbar :actions     actions
+                                              :model       :cake
+                                              :on-change   on-action]])))
