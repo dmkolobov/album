@@ -2,7 +2,7 @@
   (:require
     [ui.views.common.toolbar :as toolbar]
 
-    [reagent.core :as reagent]
+    [reagent.core :as reagent :refer [atom]]
     [re-com.core :as re-com])
   (:require-macros
     [devcards.core :refer [defcard]]))
@@ -13,9 +13,10 @@
                          :size         :regular
                          :on-click     identity])
 
-(let [actions   [{:id :book     :icon "zmdi-book"     :label "book"}
-                 {:id :cake     :icon "zmdi-cake"     :label "cake"}
-                 {:id :cocktail :icon "zmdi-cocktail" :label "cocktail"}]
+(let [actions   (atom
+                  [{:id :book     :icon "zmdi-book"     :label "book"}
+                   {:id :cake     :icon "zmdi-cake"     :label "cake"}
+                   {:id :cocktail :icon "zmdi-cocktail" :label "cocktail"}])
       on-action (comp println vector :id)
       on-nav    (partial println "toolbar nav")]
 
@@ -28,8 +29,10 @@
                             :on-nav      on-nav
                             :on-action   on-action]))
 
-(defcard navbar
-         (reagent/as-element
-           [re-com/box :child [toolbar/navbar :actions     actions
-                                              :model       :cake
-                                              :on-change   on-action]])))
+(let [model     (atom :book)
+      on-change #(reset! model (:id %))]
+  (defcard navbar
+           (reagent/as-element
+             [re-com/box :child [toolbar/navbar :actions     actions
+                                                :model       model
+                                                :on-change   on-change]]))))

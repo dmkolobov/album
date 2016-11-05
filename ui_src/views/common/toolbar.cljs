@@ -43,9 +43,9 @@
                             [action :icon      (icon-fn act)
                                     :label     (label-fn act)
                                     :position  :right-center
-                                    :emphasis? (= (id-fn act) model)
+                                    :emphasis? (= (id-fn act) @model)
                                     :on-click  #(on-change act)])
-                          actions))])
+                          @actions))])
 
 (defn toolbar
   [& {:keys [class
@@ -85,5 +85,5 @@
                                      :label    (action-label-fn act)
                                      :position :below-center
                                      :on-click #(on-action act)])
-                           actions)))])
+                           @actions)))])
 ;;
