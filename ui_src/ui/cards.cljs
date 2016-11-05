@@ -2,9 +2,10 @@
   (:require
     [ui.views.common.toolbar :as toolbar]
     [ui.views.common.structure :as struct]
+    [ui.views.common.images :as images]
 
     [reagent.core :as reagent :refer [atom]]
-    [re-com.core :as re-com :refer [box]])
+    [re-com.core :as re-com :refer [v-box h-box box]])
   (:require-macros
     [devcards.core :refer [defcard]]))
 
@@ -64,3 +65,30 @@
                             {:on-click toggle-menu!})])
 
 (defcard layout (reagent/as-element [main-structure]))
+
+(def test-images
+  [["img/fix/fire_pit.jpg"  (/ 1024 683)]
+   ["img/fix/good_deal.jpg" (/ 826 826)]
+   ["img/fix/see_saw.jpg"   (/ 1024 1536)]])
+
+(defn framed-image
+  [entry frame-size]
+  [box :class  "photo-frame shadow-1"
+       :width  (str frame-size "px")
+       :height (str frame-size "px")
+       :style  {:position "relative"}
+       :child  (into [images/image] entry)])
+
+(def frames [100 250 500])
+
+(defn frame-set
+  [entry]
+  [h-box :gap      "16px"
+         :align    :center
+         :children (map #(conj [framed-image entry] %) frames)])
+
+(defcard responsive-images
+         (reagent/as-element
+           [v-box :gap      "16px"
+                  :children (map #(vector frame-set %)
+                                 test-images)]))

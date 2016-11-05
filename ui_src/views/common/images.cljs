@@ -1,4 +1,4 @@
-(ns ui.views.images
+(ns ui.views.common.images
   (:require [re-frame.core :refer [subscribe]]
             [re-com.core :refer [box throbber]]))
 
@@ -14,16 +14,6 @@
                               :bottom     0
                               :left       0
                               :margin     "auto"}}
-                     (when on-click {:on-click on-click}))])
-
-(defn block-image
-  [& {:keys [path on-click]}]
-  [:img.image (merge {:src   path
-                      :style {:margin     "0 auto"
-                              :max-width  "100%"
-                              :max-height "100%"
-                              :display    "block"
-                              :z-index    1}}
                      (when on-click {:on-click on-click}))])
 
 (defn square
@@ -54,6 +44,9 @@
    [absolute-image :path path]])
 
 (defn image
+  "Display an image so that it fills as much content as it can
+  while preserving aspect ratio. Requires that the parent element
+  has CSS positioning other than 'fixed'"
   [path aspect]
   (cond (= aspect 1) [square path aspect]
         (> aspect 1) [landscape path aspect]
