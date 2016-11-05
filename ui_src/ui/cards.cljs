@@ -35,4 +35,9 @@
            (reagent/as-element
              [re-com/box :child [toolbar/navbar :actions     actions
                                                 :model       model
-                                                :on-change   on-change]]))))
+                                                :on-change   on-change]]))
+  (defcard navmenu
+           (reagent/as-element
+             [re-com/box :child [toolbar/navmenu :actions     actions
+                                 :model       model
+                                 :on-change   on-change]]))))

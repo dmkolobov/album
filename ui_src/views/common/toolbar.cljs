@@ -1,5 +1,5 @@
 (ns ui.views.common.toolbar
-  (:require [re-com.core :as re-com :refer [v-box h-box box md-icon-button]]))
+  (:require [re-com.core :as re-com :refer [button v-box h-box box md-icon-button]]))
 
 (def app-gap 16)
 
@@ -7,10 +7,8 @@
 
 (defn action
   [& {:keys [icon label position emphasis? on-click]}]
-  [box :class (str "action-button "
-                   (when emphasis? "emphasis"))
+  [box :class (str "action-button " (when emphasis? "emphasis"))
        :child [md-icon-button :md-icon-name     icon
-                              :size             :regular
                               :tooltip          label
                               :tooltip-position position
                               :on-click         on-click]])
@@ -34,7 +32,7 @@
       :or   {id-fn    :id
              icon-fn  :icon
              label-fn :label}}]
-  [v-box :class    (str "shadow-1 nav-ribbon " class)
+  [v-box :class    (str "nav-ribbon " class)
          :align    :center
          :gap      ribbon-gap
          :padding  ribbon-padding
@@ -45,6 +43,39 @@
                                     :position  :right-center
                                     :emphasis? (= (id-fn act) @model)
                                     :on-click  #(on-change act)])
+                          @actions))])
+
+(defn navmenu
+  [& {:keys [class
+
+             model
+             actions
+             on-change
+             id-fn
+             icon-fn
+             label-fn]
+
+      :or   {id-fn    :id
+             icon-fn  :icon
+             label-fn :label}}]
+  [v-box :class    (str "nav-ribbon " class)
+         :align    :center
+         :children (doall
+                     (map (fn [act]
+                            ^{:key (id-fn act)}
+                            [h-box :class    (str "nav-button"
+                                                  (when (= @model (id-fn act))
+                                                    " active"))
+                                   :gap      ribbon-gap
+                                   :padding  ribbon-padding
+                                   :width    "100%"
+                                   :align    :center
+                                   :children [[:i.zmdi {:class (icon-fn act)}]
+                                              [re-com/title :label         (label-fn act)
+                                                            :level         :level3
+                                                            :margin-top    "0px"
+                                                            :margin-bottom "0px"]]
+                                   :attr {:on-click #(on-change act)}])
                           @actions))])
 
 (defn toolbar
