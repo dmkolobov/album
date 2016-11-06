@@ -1,5 +1,6 @@
 (ns ui.views.common.toolbar
-  (:require [re-com.core :as re-com :refer [button v-box h-box box md-icon-button]]))
+  (:require [re-com.core :as re-com :refer [button v-box h-box box md-icon-button]]
+            [re-com.util :refer [deref-or-value]]))
 
 (def app-gap 16)
 
@@ -59,7 +60,7 @@
                                          :position  :right-center
                                          :emphasise? (= (id-fn act) @model)
                                          :on-click  #(on-change act)])
-                          @actions))])
+                          (deref-or-value actions)))])
 
 (defn navmenu
   [& {:keys [class
@@ -83,7 +84,7 @@
                                          :label      (label-fn act)
                                          :emphasise? (= @model (id-fn act))
                                          :on-click   #(on-change act)])
-                          @actions))])
+                          (deref-or-value actions)))])
 
 (defn toolbar
   [& {:keys [class
@@ -123,5 +124,5 @@
                                           :label    (action-label-fn act)
                                           :position :below-center
                                           :on-click #(on-action act)])
-                           @actions)))])
+                           (deref-or-value actions))))])
 ;;

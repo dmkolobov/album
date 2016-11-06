@@ -20,6 +20,7 @@
                                         :content side-nav]
 
                     [v-box :size     "auto"
+                           :class    "content-canvas"
                            :children [[box :class "app-bar"
                                            :child app-bar]
                                       [box :class "app-content"
