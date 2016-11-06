@@ -5,11 +5,11 @@
 
 (def side-sheet
   (animate/slide-left-transition
-    (fn [nav] [box :class "side-nav shadow-1" :child nav])))
+    (fn [nav] [box :class "side-nav shadow-2" :child nav])))
 
 (def right-sheet
   (animate/slide-right-transition
-    (fn [nav] [box :class "right-nav shadow-1" :child nav])))
+    (fn [nav] [box :size "none" :class "right-nav shadow-2" :child nav])))
 
 (defn main
   [& {:keys [app-bar side-nav content right-nav attr]}]
