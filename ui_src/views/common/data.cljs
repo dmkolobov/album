@@ -1,5 +1,6 @@
 (ns ui.views.common.data
   (:require [ui.views.common.animations :as animations]
+            [ui.views.common.form :as form]
 
             [reagent.core :refer [atom]]
             [re-com.core :as re-com :refer [box h-box button v-box label title md-icon-button input-text]]
@@ -8,11 +9,11 @@
             [cljs-time.core :as time]
             [cljs-time.format :as timef]))
 
-(def date-only (timef/formatter "MMM dd, yyyy"))
-(def day-time  (timef/formatter "EEE hh:mm a"))
-
 (def app-gap 16)
 (defn px [x] (str x "px"))
+
+(def date-only (timef/formatter "MMM dd, yyyy"))
+(def day-time  (timef/formatter "EEE hh:mm a"))
 
 (defn attribute
   [& {:keys [label children]}]
@@ -56,7 +57,7 @@
            :attr  {:on-click (partial toggle-ampm! model)}]))
 
 (defn date-form
-  [model commit]
+  [model]
   (let [set-attr (fn [attr val] (swap! model assoc attr (js/parseInt val)))
         input    (fn [attr width & {:keys [pad]}]
                    [input-text :model     (pad-string pad (str (get @model attr)))
@@ -94,69 +95,11 @@
                       [label :class "date-label"
                              :label (timef/unparse day-time date)]]]))
 
-(defn date-time->model
-  [date-time]
-  {:year   (.getFullYear date-time)
-   :month  (inc (.getMonth date-time))
-   :day    (.getDate date-time)
-   :hour   (.getHours date-time)
-   :minute (.getMinutes date-time)})
-
-(def app-padding (str (px app-gap)" "(px (* app-gap 1.5))))
-
-(def form-transition
-  (animations/grow-transition (fn [v] [box :class "form-content" :child v])))
-
-(defn form
-  [& {:keys [icon class on-edit on-commit on-discard title content editing?]}]
-  [v-box :class    (str "form " class (when (deref-or-value editing?) " active"))
-         :children [(when @editing?
-                      [box :class "form-overlay"
-                           :attr  {:on-click on-discard}
-                           :child [:div ""]])
-                    [h-box :align    :center
-                           :class    "form-header"
-                           :padding  app-padding
-                           :gap      (px (* app-gap 1.5))
-                           :attr     {:on-click on-edit}
-                           :children [[box :child [:i.icon.zmdi {:class icon}]]
-                                      title]]
-                    [animations/transition :name    "form-content"
-                                           :class   form-transition
-                                           :content (when @editing?
-                                                     [h-box :align    :center
-                                                            :class    "form-content"
-                                                            :padding  app-padding
-                                                            :gap      (px (* app-gap 1.5))
-                                                            :children [[box :child [:i.icon.zmdi {:class icon :style {:opacity "0"}}]]
-                                                                             [v-box :gap (px app-gap)
-                                                                                    :children [content
-                                                                                               [h-box :justify  :end
-                                                                                                      :gap      (px (/ app-gap 2))
-                                                                                                      :children [[button :label    "Cancel"
-                                                                                                                         :on-click on-discard]
-                                                                                                                 [button :label    "Save"
-                                                                                                                         :on-click on-commit]]]]]]])]]])
-
 (defn date-field
-  [& {:keys [model on-change]}]
-  (let [edit?         (atom false)
-        local-model   (atom (date-time->model @model))
-        commit-edit!  #(do
-                        (swap! edit? not)
-                        (on-change @local-model))
-        discard-edit! #(do
-                        (swap! edit? not)
-                        (reset! local-model (date-time->model @model)))
-        toggle-edit!  #(do
-                        (println "edit toggle")
-                        (swap! edit? not))]
-    (fn [& {:keys [class]}]
-      [form :icon       "zmdi-calendar"
-            :class      class
-            :editing?   edit?
-            :on-edit    toggle-edit!
-            :on-commit  commit-edit!
-            :on-discard discard-edit!
-            :title      [date-display local-model]
-            :content    [date-form local-model]])))
+  [& {:keys [class model on-change]}]
+  [form/attr-form :icon       "zmdi-calendar"
+                  :class      class
+                  :model      model
+                  :on-commit  on-change
+                  :content-fn date-display
+                  :form-fn    date-form])

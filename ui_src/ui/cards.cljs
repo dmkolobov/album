@@ -9,6 +9,7 @@
     [cljs-time.core :as time]
 
     [reagent.core :as reagent :refer [atom]]
+    [reagent.ratom :refer [make-reaction]]
     [re-com.core :as re-com :refer [v-box h-box box]])
   (:require-macros
     [devcards.core :refer [defcard]]))
@@ -112,13 +113,31 @@
 (defcard nav-bar  (reagent/as-element [box :child [app-nav-bar]]))
 (defcard nav-menu (reagent/as-element [box :child [app-nav-menu]]))
 
-(let [state   (atom (js/goog.date.DateTime.))
-      update! #(reset! state %)]
-  (defcard date
-           (reagent/as-element
-             [box :child [data/date-field :class     "white"
-                                          :model     state
-                                          :on-change update!]])))
+(defn date-time->model
+  [date-time]
+  {:year   (.getFullYear date-time)
+   :month  (inc (.getMonth date-time))
+   :day    (.getDate date-time)
+   :hour   (.getHours date-time)
+   :minute (.getMinutes date-time)})
+
+(defn model->date-time
+  [{:keys [year month day hour minute]}]
+  (js/goog.date.DateTime. year (dec month) day hour minute))
+
+(def my-date (atom (js/goog.date.DateTime.)))
+(def set-date! #(reset! my-date (model->date-time %)))
+
+(defn date
+  []
+  [box :child [data/date-field :class     "white"
+                               :model     (make-reaction
+                                            (fn []
+                                              (println "creating date state")
+                                              (date-time->model @my-date)))
+                               :on-change set-date!]])
+
+(defcard date-form (reagent/as-element [date]))
 
 (defn slideshow-bar
   []
@@ -137,7 +156,7 @@
                :side-nav  (when @menu? [app-nav-menu])
                :content   [app-content]
                :right-nav (when (and @slideshow? @info?)
-                            [box :child "foobar"])
+                            [v-box :children [[date]]])
                :attr      (when @menu?
                             {:on-click toggle-menu!})])
 
