@@ -11,10 +11,11 @@
 
 ;; -------------- photos ---------------------
 
-(def test-images
-  [["img/fix/fire_pit.jpg"    (/ 1024 683)]
-   ["img/fix/good_deal.jpg"   (/ 826 826)]
-   ["img/fix/see_saw.jpg"     (/ 1024 1536)]])
+(defonce test-images
+  (atom
+    [["img/fix/fire_pit.jpg"    (/ 1024 683)]
+     ["img/fix/good_deal.jpg"   (/ 826 826)]
+     ["img/fix/see_saw.jpg"     (/ 1024 1536)]]))
 
 (def test-images-small
    [["img/fix/jackhammer.jpg"  (/ 200 200)]
@@ -22,23 +23,32 @@
     ["img/fix/fire_stick.jpg"  (/ 133 200)]])
 
 (defn framed-image
-  [entry frame-size]
+  [path aspect frame-size]
   [box :class  "photo-frame shadow-1"
        :width  (str frame-size "px")
        :height (str frame-size "px")
        :style  {:position "relative"}
-       :child  (into [images/image] entry)])
+       :child  [images/image path aspect]])
 
 (def frames [100 250 500])
 
-(defcard responsive-images
-         (reagent/as-element
-           [v-box :gap      "16px"
-            :children (map (fn [entry]
-                             [h-box :gap      "16px"
-                                    :align    :center
-                                    :children (map #(conj [framed-image entry] %) frames)])
-                           test-images)]))
+(defn framed-gallery
+  [images]
+  [v-box :gap      "16px"
+         :children (map (fn [[path aspect]]
+                          [h-box :gap      "16px"
+                                 :align    :center
+                                 :children (map #(conj [framed-image path aspect] %) frames)])
+                        images)])
+
+(defn app-gallery
+  []
+  [v-box :children [[re-com/title :label "Oversized" :level :level2]
+                    [framed-gallery @test-images]
+                    [re-com/title :label "Undersized" :level :level2]
+                    [framed-gallery test-images-small]]])
+
+(defcard responsive-images (reagent/as-element [app-gallery]))
 
 (defn test-image
   []
