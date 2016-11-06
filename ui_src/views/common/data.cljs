@@ -83,7 +83,7 @@
   (let [{:keys [year month day hour minute]} @model
         date (time/date-time year month day hour minute)]
     [v-box :size     "auto"
-           :gap      (px (/ app-gap 2))
+           :gap      (px (/ app-gap 4))
            :children [[title :label         (timef/unparse date-only date)
                              :margin-top    "0px"
                              :margin-bottom "0px"
@@ -100,6 +100,37 @@
    :hour   (.getHours date-time)
    :minute (.getMinutes date-time)})
 
+(def app-padding (str (px app-gap)" "(px (* app-gap 1.5))))
+
+(defn form
+  [& {:keys [icon class on-edit on-commit on-discard title content editing?]}]
+  [v-box :class    (str "form " class (when (deref-or-value editing?) " active"))
+         :children [(when @editing?
+                      [box :class "form-overlay"
+                           :attr  {:on-click on-discard}
+                           :child [:div ""]])
+                    [h-box :align    :center
+                           :class    "form-header"
+                           :padding  app-padding
+                           :gap      (px (* app-gap 1.5))
+                           :attr     {:on-click on-edit}
+                           :children [[box :child [:i.icon.zmdi {:class icon}]]
+                                      title]]
+                     (when (deref-or-value editing?)
+                       [h-box :align    :center
+                              :class    "form-content"
+                              :padding  app-padding
+                              :gap      (px (* app-gap 1.5))
+                              :children [[box :child [:i.icon.zmdi {:class icon :style {:opacity "0"}}]]
+                                               [v-box :gap (px app-gap)
+                                                      :children [content
+                                                                 [h-box :justify  :end
+                                                                        :gap      (px (/ app-gap 2))
+                                                                        :children [[button :label    "Cancel"
+                                                                                           :on-click on-discard]
+                                                                                   [button :label    "Save"
+                                                                                           :on-click on-commit]]]]]]])]])
+
 (defn date-field
   [& {:keys [model on-change]}]
   (let [edit?         (atom false)
@@ -110,26 +141,15 @@
         discard-edit! #(do
                         (swap! edit? not)
                         (reset! local-model (date-time->model @model)))
-        toggle-edit!  #(swap! edit? not)]
+        toggle-edit!  #(do
+                        (println "edit toggle")
+                        (swap! edit? not))]
     (fn [& {:keys [class]}]
-      [v-box :class    (str "date " class)
-             :padding  (px app-gap)
-             :gap      (px app-gap)
-             :children [[h-box :align    :baseline
-                               :gap      (px app-gap)
-                               :children [[date-display local-model]
-                                          (when (not @edit?)
-                                            [md-icon-button :class        "date-edit-icon"
-                                                            :size         :smaller
-                                                            :md-icon-name (if @edit? "zmdi-close" "zmdi-edit")
-                                                            :on-click     toggle-edit!])]]
-                        (when @edit?
-                          [date-form local-model commit-edit!])
-
-                        (when @edit?
-                          [h-box :gap      (px app-gap)
-                                 :justify  :end
-                                 :children [[button :label    "Cancel"
-                                                    :on-click discard-edit!]
-                                            [button :label    "Save"
-                                                    :on-click commit-edit!]]])]])))
+      [form :icon       "zmdi-calendar"
+            :class      class
+            :editing?   edit?
+            :on-edit    toggle-edit!
+            :on-commit  commit-edit!
+            :on-discard discard-edit!
+            :title      [date-display local-model]
+            :content    [date-form local-model]])))
