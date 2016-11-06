@@ -3,6 +3,10 @@
     [ui.views.common.toolbar :as toolbar]
     [ui.views.common.structure :as struct]
     [ui.views.common.images :as images]
+    [ui.views.common.data :as data]
+
+    [cljs-time.extend]
+    [cljs-time.core :as time]
 
     [reagent.core :as reagent :refer [atom]]
     [re-com.core :as re-com :refer [v-box h-box box]])
@@ -107,6 +111,14 @@
 (defcard bar      (reagent/as-element [app-bar]))
 (defcard nav-bar  (reagent/as-element [box :child [app-nav-bar]]))
 (defcard nav-menu (reagent/as-element [box :child [app-nav-menu]]))
+
+(let [state   (atom (js/goog.date.DateTime.))
+      update! #(reset! state %)]
+  (defcard date
+           (reagent/as-element
+             [box :child [data/date-field :class     "white"
+                                          :model     state
+                                          :on-change update!]])))
 
 (defn slideshow-bar
   []

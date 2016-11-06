@@ -14,7 +14,8 @@
                  [com.cognitect/transit-cljs "0.8.239"]
                  [day8.re-frame/async-flow-fx "0.1.2-DEV"]
                  [datascript "0.15.4"]
-                 [posh "0.5.4"]]
+                 [posh "0.5.4"]
+                 [com.andrewmcveigh/cljs-time "0.4.0"]]
   :plugins [[lein-cljsbuild "1.1.1"]
             [lein-figwheel "0.5.2"]]
 
