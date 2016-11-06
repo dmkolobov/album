@@ -52,6 +52,41 @@
                            "transitionend"
                            cb)))))
 
+(defn grow
+  [cb]
+  (this-as owner
+    (let [node   (reagent/dom-node owner)]
+      (.log js/console node)
+      (aset node "style" "height" "auto")
+      (let [style  (js/getComputedStyle node)
+            height (.-height style)
+            width  (.-width style)]
+        (aset node "style" "height" 0)
+        (aset node "style" "width" 0)
+        (aset node "style" "overflow" "hidden")
+        (aget node "offsetLeft")
+        (aset node "style" "transition" "height 150ms ease-in-out 50ms, width 150ms ease-in-out")
+        (.addEventListener node "transitionend" cb)
+        (aset node "style" "height" height)
+        (aset node "style" "width" width)))))
+
+(defn shrink
+  [cb]
+  (this-as owner
+    (let [node   (reagent/dom-node owner)]
+        (aset node "style" "transition" "height 150ms ease-in-out, width 150ms ease-in-out 50ms")
+        (.addEventListener node "transitionend" cb)
+        (aset node "style" "width" 0)
+        (aset node "style" "height" 0))))
+
+
+(defn grow-transition
+  [render-fn]
+  (reagent/create-class
+    {:component-will-enter grow
+     :component-will-leave shrink
+     :reagent-render       render-fn}))
+
 (defn slide-left-transition
   [render-fn]
   (reagent/create-class

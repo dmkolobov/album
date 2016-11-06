@@ -1,5 +1,7 @@
 (ns ui.views.common.data
-  (:require [reagent.core :refer [atom]]
+  (:require [ui.views.common.animations :as animations]
+
+            [reagent.core :refer [atom]]
             [re-com.core :as re-com :refer [box h-box button v-box label title md-icon-button input-text]]
             [re-com.util :refer [deref-or-value]]
             [cljs-time.extend]
@@ -102,6 +104,9 @@
 
 (def app-padding (str (px app-gap)" "(px (* app-gap 1.5))))
 
+(def form-transition
+  (animations/grow-transition (fn [v] [box :class "form-content" :child v])))
+
 (defn form
   [& {:keys [icon class on-edit on-commit on-discard title content editing?]}]
   [v-box :class    (str "form " class (when (deref-or-value editing?) " active"))
@@ -116,20 +121,22 @@
                            :attr     {:on-click on-edit}
                            :children [[box :child [:i.icon.zmdi {:class icon}]]
                                       title]]
-                     (when (deref-or-value editing?)
-                       [h-box :align    :center
-                              :class    "form-content"
-                              :padding  app-padding
-                              :gap      (px (* app-gap 1.5))
-                              :children [[box :child [:i.icon.zmdi {:class icon :style {:opacity "0"}}]]
-                                               [v-box :gap (px app-gap)
-                                                      :children [content
-                                                                 [h-box :justify  :end
-                                                                        :gap      (px (/ app-gap 2))
-                                                                        :children [[button :label    "Cancel"
-                                                                                           :on-click on-discard]
-                                                                                   [button :label    "Save"
-                                                                                           :on-click on-commit]]]]]]])]])
+                    [animations/transition :name    "form-content"
+                                           :class   form-transition
+                                           :content (when @editing?
+                                                     [h-box :align    :center
+                                                            :class    "form-content"
+                                                            :padding  app-padding
+                                                            :gap      (px (* app-gap 1.5))
+                                                            :children [[box :child [:i.icon.zmdi {:class icon :style {:opacity "0"}}]]
+                                                                             [v-box :gap (px app-gap)
+                                                                                    :children [content
+                                                                                               [h-box :justify  :end
+                                                                                                      :gap      (px (/ app-gap 2))
+                                                                                                      :children [[button :label    "Cancel"
+                                                                                                                         :on-click on-discard]
+                                                                                                                 [button :label    "Save"
+                                                                                                                         :on-click on-commit]]]]]]])]]])
 
 (defn date-field
   [& {:keys [model on-change]}]
