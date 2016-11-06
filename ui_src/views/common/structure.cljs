@@ -22,7 +22,8 @@
                     [v-box :size     "auto"
                            :children [[box :class "app-bar"
                                            :child app-bar]
-                                      content]]
+                                      [box :class "app-content"
+                                           :child content]]]
 
                     [animate/transition :name    "right-nav"
                                         :class   right-sheet

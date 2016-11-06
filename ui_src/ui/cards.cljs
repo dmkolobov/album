@@ -9,6 +9,46 @@
   (:require-macros
     [devcards.core :refer [defcard]]))
 
+;; -------------- photos ---------------------
+
+(def test-images
+  [["img/fix/fire_pit.jpg"    (/ 1024 683)]
+   ["img/fix/good_deal.jpg"   (/ 826 826)]
+   ["img/fix/see_saw.jpg"     (/ 1024 1536)]])
+
+(def test-images-small
+   [["img/fix/jackhammer.jpg"  (/ 200 200)]
+    ["img/fix/death_truck.jpg" (/ 200 150)]
+    ["img/fix/fire_stick.jpg"  (/ 133 200)]])
+
+(defn framed-image
+  [entry frame-size]
+  [box :class  "photo-frame shadow-1"
+       :width  (str frame-size "px")
+       :height (str frame-size "px")
+       :style  {:position "relative"}
+       :child  (into [images/image] entry)])
+
+(def frames [100 250 500])
+
+(defcard responsive-images
+         (reagent/as-element
+           [v-box :gap      "16px"
+            :children (map (fn [entry]
+                             [h-box :gap      "16px"
+                                    :align    :center
+                                    :children (map #(conj [framed-image entry] %) frames)])
+                           test-images)]))
+
+(defn test-image
+  []
+  [box :size   "auto"
+       :height "200px"
+       :style  {:position "relative"}
+       :child  [images/image "img/fix/fire_pit.jpg" (/ 1024 683)]])
+
+;; ---------------- interface -------------------
+
 (defonce actions
   (atom
     [{:id :book     :icon "zmdi-book"     :label "book"}
@@ -52,7 +92,8 @@
 (defn app-content
   []
   [re-com/h-box :children [[app-nav-bar]
-                           [box :child [:div "hello, world"]]]])
+                           [box :size "auto"
+                                :child [test-image]]]])
 
 (defcard bar (reagent/as-element [app-bar]))
 (defcard nav-bar (reagent/as-element [box :child [app-nav-bar]]))
@@ -69,30 +110,3 @@
                             {:on-click toggle-menu!})])
 
 (defcard layout (reagent/as-element [main-structure]))
-
-(def test-images
-  [["img/fix/fire_pit.jpg"    (/ 1024 683)]
-   ["img/fix/good_deal.jpg"   (/ 826 826)]
-   ["img/fix/see_saw.jpg"     (/ 1024 1536)]
-   ["img/fix/jackhammer.jpg"  (/ 200 200)]
-   ["img/fix/death_truck.jpg" (/ 200 150)]
-   ["img/fix/fire_stick.jpg"  (/ 133 200)]])
-
-(defn framed-image
-  [entry frame-size]
-  [box :class  "photo-frame shadow-1"
-       :width  (str frame-size "px")
-       :height (str frame-size "px")
-       :style  {:position "relative"}
-       :child  (into [images/image] entry)])
-
-(def frames [100 250 500])
-
-(defcard responsive-images
-         (reagent/as-element
-           [v-box :gap      "16px"
-                  :children (map (fn [entry]
-                                   [h-box :gap      "16px"
-                                          :align    :center
-                                          :children (map #(conj [framed-image entry] %) frames)])
-                                 test-images)]))
