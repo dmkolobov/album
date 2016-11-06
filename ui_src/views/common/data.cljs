@@ -1,6 +1,6 @@
 (ns ui.views.common.data
   (:require [reagent.core :refer [atom]]
-            [re-com.core :as re-com :refer [box h-box v-box label title md-icon-button input-text]]
+            [re-com.core :as re-com :refer [box h-box button v-box label title md-icon-button input-text]]
             [re-com.util :refer [deref-or-value]]
             [cljs-time.extend]
             [cljs-time.core :as time]
@@ -18,7 +18,7 @@
          :gap      "0.7em"
          :children [[re-com/label :class "attr-label"
                                   :label label]
-                    [h-box :align :center :children children]]])
+                    [h-box :gap (px (/ app-gap 4)) :align :center :children children]]])
 
 (defn pad-string
   [n s]
@@ -82,8 +82,8 @@
   [model]
   (let [{:keys [year month day hour minute]} @model
         date (time/date-time year month day hour minute)]
-    [v-box :size "auto"
-           :gap  "0.5em"
+    [v-box :size     "auto"
+           :gap      (px (/ app-gap 2))
            :children [[title :label         (timef/unparse date-only date)
                              :margin-top    "0px"
                              :margin-bottom "0px"
@@ -92,30 +92,44 @@
                       [label :class "date-label"
                              :label (timef/unparse day-time date)]]]))
 
+(defn date-time->model
+  [date-time]
+  {:year   (.getFullYear date-time)
+   :month  (inc (.getMonth date-time))
+   :day    (.getDate date-time)
+   :hour   (.getHours date-time)
+   :minute (.getMinutes date-time)})
+
 (defn date-field
   [& {:keys [model on-change]}]
-  (let [edit?        (atom false)
-        local-model  (let [date-time @model]
-                       (atom
-                         {:year   (.getFullYear date-time)
-                          :month  (inc (.getMonth date-time))
-                          :day    (.getDate date-time)
-                          :hour   (.getHours date-time)
-                          :minute (.getMinutes date-time)}))
-        commit-edit! (fn [] (on-change @local-model))
-        toggle-edit! (fn [] (swap! edit? not))]
+  (let [edit?         (atom false)
+        local-model   (atom (date-time->model @model))
+        commit-edit!  #(do
+                        (swap! edit? not)
+                        (on-change @local-model))
+        discard-edit! #(do
+                        (swap! edit? not)
+                        (reset! local-model (date-time->model @model)))
+        toggle-edit!  #(swap! edit? not)]
     (fn [& {:keys [class]}]
-      (println
-        (implements? IEquiv @local-model))
       [v-box :class    (str "date " class)
              :padding  (px app-gap)
              :gap      (px app-gap)
              :children [[h-box :align    :baseline
                                :gap      (px app-gap)
                                :children [[date-display local-model]
-                                          [md-icon-button :class        "date-edit-icon"
-                                                          :size         :smaller
-                                                          :md-icon-name (if @edit? "zmdi-close" "zmdi-edit")
-                                                          :on-click     toggle-edit!]]]
+                                          (when (not @edit?)
+                                            [md-icon-button :class        "date-edit-icon"
+                                                            :size         :smaller
+                                                            :md-icon-name (if @edit? "zmdi-close" "zmdi-edit")
+                                                            :on-click     toggle-edit!])]]
                         (when @edit?
-                          [date-form local-model commit-edit!])]])))
+                          [date-form local-model commit-edit!])
+
+                        (when @edit?
+                          [h-box :gap      (px app-gap)
+                                 :justify  :end
+                                 :children [[button :label    "Cancel"
+                                                    :on-click discard-edit!]
+                                            [button :label    "Save"
+                                                    :on-click commit-edit!]]])]])))
