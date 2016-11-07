@@ -8,9 +8,6 @@
 (defn px [x] (str x "px"))
 (def app-padding (str (px app-gap)" "(px (* app-gap 1.5))))
 
-(def form-transition
-  (animations/grow-transition (fn [v] [box :class "form-content" :child v])))
-
 (defn form-header
   [icon title on-edit]
   [h-box :align    :center
@@ -38,8 +35,9 @@
                                                                 :on-click on-commit]]]]]]])
 
 (defn form-overlay
-  [on-discard]
+  [on-discard opacity]
   [box :class "form-overlay"
+       :style {:background (str "rgba(0,0,0,"opacity"")}
        :attr  {:on-click on-discard}
        :child [:div ""]])
 
@@ -57,13 +55,12 @@
                    (reset! edit? true))
         watch-id (gensym)]
     (add-watch model watch-id (fn [_ _ _ v] (reset! local-model v)))
-    (fn [& {:keys [icon class]}]
+    (fn [& {:keys [icon class overlay-opacity]}]
       [v-box :class    (str "form " class (when @edit? " active"))
              :size     "none"
-             :children [(when @edit? [form-overlay discard!])
+             :children [(when (and @edit? overlay-opacity)
+                          [form-overlay discard! overlay-opacity])
                         [form-header icon [content-fn local-model] edit!]
-                        [animations/transition :name    "form-content"
-                                               :class   form-transition
-                                               :content (when @edit?
-                                                          [form-content icon [form-fn local-model] commit! discard!])]]])))
-
+                        [animations/grow "form-content"
+                                         (when @edit?
+                                           [form-content icon [form-fn local-model] commit! discard!])]]])))

@@ -156,7 +156,9 @@
                :side-nav  (when @menu? [app-nav-menu])
                :content   [app-content]
                :right-nav (when (and @slideshow? @info?)
-                            [v-box :children [[date]]])
+                            [v-box :children [[date]
+                                              [date]
+                                              [date]]])
                :attr      (when @menu?
                             {:on-click toggle-menu!})])
 
