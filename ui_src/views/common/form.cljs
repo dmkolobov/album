@@ -61,6 +61,5 @@
              :children [(when (and @edit? overlay-opacity)
                           [form-overlay discard! overlay-opacity])
                         [form-header icon [content-fn local-model] edit!]
-                        [animations/grow "form-content"
-                                         (when @edit?
-                                           [form-content icon [form-fn local-model] commit! discard!])]]])))
+                        (when @edit?
+                                           [form-content icon [form-fn local-model] commit! discard!])]])))

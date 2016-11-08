@@ -3,6 +3,7 @@
   :description "A hello world application for electron"
   :dependencies [[org.clojure/clojure "1.8.0"]
                  [org.clojure/clojurescript "1.8.40"]
+                 [org.clojure/core.async "0.2.395"]
                  [figwheel "0.5.2"]
                  [devcards "0.2.2"]
                  [reagent "0.6.0-rc" :exclusions [cljsjs/react]]
