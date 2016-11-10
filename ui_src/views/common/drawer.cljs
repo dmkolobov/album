@@ -23,7 +23,8 @@
                                                    (fn []
                                                      (resize)))))
 
-     :reagent-render       (fn [_ child] [box :style {:position "absolute"}
+     :reagent-render       (fn [_ child] [box :class "drawer-child"
+                                              :style {:position "absolute"}
                                               :child child])}))
 
 (defn register-child
@@ -44,8 +45,8 @@
     (if (seq keys)
       (let [[key & keys'] keys
             node        (get nodes key)
-            width       (.-clientWidth node)
-            height      (.-clientHeight node)]
+            width       (.-offsetWidth node)
+            height      (.-offsetHeight node)]
         (recur keys'
                (max width max-width)
                (+ offset height)
@@ -64,18 +65,18 @@
 (defn resize-sequence
   [_ offsets]
   (doall
-    (map (fn [offset]
+    (map-indexed (fn [idx offset]
          {:initial  (translate-3d 0 offset)
           :final    (translate-3d 0 offset)
           :duration 150
-          :delay    1})
+          :delay    100})
        offsets)))
 
 (def animation-scale 1)
 
 (defn animate!
   [node callback {:keys [initial final duration delay ease]
-                  :or   {ease "ease-in-out"}}]
+                  :or   {ease "cubic-bezier(0.075, 0.82, 0.165, 1)"}}]
   (when initial
     (aset node "style" "transform" initial)
     (aget node "offsetLeft"))
@@ -107,11 +108,14 @@
                  [_ & {:keys [children]}] (reagent/argv this)
                  child-keys               (map (comp :key meta) children)
                  [max-width offsets]      (layout child-keys nodes)]
-             (println "animating")
+             (println max-width)
              (doall (map animate!
                          (map #(get nodes %) child-keys)
                          (map #(get callbacks %) child-keys)
                          (choreography max-width offsets)))
+             (animate! parent-node nil {:final    (translate-3d (- max-width) 0)
+                                        :duration 150
+                                        :delay    0})
              (recur))))
 
 
@@ -127,10 +131,11 @@
                                (println "drawer updated:" @state))
 
        :reagent-render       (fn [& {:keys [children]}]
-                               [transition
+                               [:div.drawer
+                                [transition
                                 {:name "drawer"}
                                 (doall
                                   (map (fn [child]
                                          (let [key (:key (meta child))]
                                            ^{:key key} [child-fn key child]))
-                                       children))])})))
+                                       children))]])})))

@@ -166,18 +166,13 @@
 (defcard layout (reagent/as-element [main-structure]))
 
 (defcard drawer
-         (reagent/as-element [drawer/drawer :children [^{:key "k1"} [date]
+         (reagent/as-element [:div.drawer-test
+                              {:style
+                               {:position "relative"
+                                :width    "100%"
+                                :height   "700px"}}
+                              [drawer/drawer :children [^{:key "k1"} [date]
                                                        ^{:key "k2"} [date]
                                                        ^{:key "k3"} [date]
                                                        ^{:key "k4"} [date]
-                                                       ^{:key "k5"} [date]
-                                                       ^{:key "k6"} [date]
-                                                       ^{:key "k7"} [date]
-                                                       ^{:key "k8"} [date]
-                                                       ^{:key "k9"} [date]
-                                                       ^{:key "k10"} [date]
-                                                       ^{:key "k12"} [date]
-                                                       ^{:key "k13"} [date]
-                                                       ^{:key "k11"} [date]
-                                                       ^{:key "k14"} [date]
-                                                       ^{:key "k15"} [date]]]))
+                                                       ^{:key "k5"} [date]]]]))
