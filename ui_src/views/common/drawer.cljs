@@ -71,7 +71,7 @@
           :delay    1})
        offsets)))
 
-(def animation-scale 10)
+(def animation-scale 1)
 
 (defn animate!
   [node callback {:keys [initial final duration delay ease]

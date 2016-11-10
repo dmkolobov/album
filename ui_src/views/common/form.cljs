@@ -2,7 +2,8 @@
   (:require [ui.views.common.animations :as animations]
             [reagent.core :refer [atom]]
             [re-com.core :refer [v-box h-box box button]]
-            [re-com.util :refer [deref-or-value]]))
+            [re-com.util :refer [deref-or-value]]
+            [reagent.core :as reagent]))
 
 (def app-gap 16)
 (defn px [x] (str x "px"))
@@ -41,6 +42,22 @@
        :attr  {:on-click on-discard}
        :child [:div ""]])
 
+(def transition
+  (reagent/adapt-react-class js/React.addons.TransitionGroup))
+
+(def form-transition
+  (reagent/create-class
+    {:component-will-leave
+     (fn [cb]
+       (this-as owner
+         (aset (reagent/dom-node owner)
+               "style"
+               "position"
+               "absolute")
+         (js/setTimeout cb 150)))
+     :reagent-render
+     (fn [c] c)}))
+
 (defn attr-form
   [&  {:keys [model on-commit content-fn form-fn]}]
   (let [local-model (atom @model)
@@ -61,5 +78,8 @@
              :children [(when (and @edit? overlay-opacity)
                           [form-overlay discard! overlay-opacity])
                         [form-header icon [content-fn local-model] edit!]
+                        [transition {:transition-name "form-content"}
                         (when @edit?
-                                           [form-content icon [form-fn local-model] commit! discard!])]])))
+                           ^{:key "content"}
+                           [form-transition
+                            [form-content icon [form-fn local-model] commit! discard!]])]]])))
