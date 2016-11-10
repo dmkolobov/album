@@ -1,0 +1,34 @@
+.com-rigsomelight-devcards_rendered-card {
+  background: #ddd;
+  padding: 1em;
+}
+
+.toolbar, .nav-ribbon {
+  background: #fff;
+}
+
+.toolbar.translucent {
+  box-shadow: none;
+  position:   absolute;
+  left:       0;
+  width:      100%;
+  background: none;
+}
+
+.action-button.emphasis {
+  color: #2196F3;
+}
+
+.nav-button i, .icon {
+  text-align: center;
+  width:      24px;
+  font-size:  24px;
+}
+
+.nav-button:hover {
+  background: #E3F2FD;
+}
+
+.nav-button.active, .nav-button.active .rc-title {
+  color: #2196f3;
+}

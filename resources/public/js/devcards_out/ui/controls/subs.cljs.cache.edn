@@ -1,0 +1,2 @@
+;; Analyzed by ClojureScript 1.8.40
+{:name ui.controls.subs, :doc nil, :excludes #{}, :use-macros nil, :require-macros nil, :uses {reg-sub re-frame.core}, :requires {re-frame.core re-frame.core}, :imports nil, :cljs.analyzer/constants {:seen #{:controls/sidebar-left? :controls/current-view :photos-view :controls/view-stack}, :order [:controls/current-view :controls/view-stack :photos-view :controls/sidebar-left?]}}

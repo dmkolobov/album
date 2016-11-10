@@ -1,0 +1,2 @@
+;; Analyzed by ClojureScript 1.8.40
+{:name views.pages.fullscreen, :doc nil, :excludes #{}, :use-macros nil, :require-macros nil, :uses {h-box re-com.core, box re-com.core, v-box re-com.core, dispatch re-frame.core, md-icon-button re-com.core, toolbar ui.views.common.toolbar}, :requires {re-com.core re-com.core, re-frame.core re-frame.core, ui.views.common.toolbar ui.views.common.toolbar}, :imports nil}

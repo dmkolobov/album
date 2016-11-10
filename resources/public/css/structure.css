@@ -1,0 +1,44 @@
+.structure {
+  position:   relative;
+  background: #fff;
+}
+
+.content-canvas {
+  position:  relative;
+}
+
+.app-bar {
+  z-index: 1;
+}
+
+.side-nav {
+  position: absolute;
+}
+
+.side-nav {
+  z-index: 2;
+  top:     0;
+  left:    0;
+  bottom:  0;
+}
+
+.side-nav-enter {
+    opacity: 0;
+}
+
+.side-nav {
+    opacity: 1;
+}
+
+.right-nav {
+  position: relative;
+  z-index:  2;
+
+  top:    0;
+  right:  0;
+  bottom: 0;
+
+  height: 100%;
+
+  background: #fff;
+}

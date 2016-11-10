@@ -1,0 +1,2 @@
+;; Analyzed by ClojureScript 1.8.40
+{:name day8.re-frame.forward-events-fx, :doc nil, :excludes #{}, :use-macros nil, :require-macros nil, :uses nil, :requires {re-frame re-frame.core, re-frame.core re-frame.core}, :imports nil, :cljs.analyzer/constants {:seen #{:unregister :else :events :forward-events :dispatch-to :register :error}, :order [:forward-events :unregister :register :events :dispatch-to :else :error]}}

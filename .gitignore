@@ -1,7 +1,6 @@
 .lein-repl-history 
 hello-electron.iml
 target/
-resources/
 node_modules/
 *-init.clj
 figwheel_server.log

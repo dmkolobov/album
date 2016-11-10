@@ -1,0 +1,199 @@
+html, body, #app-container {
+  height: 100%;
+}
+
+body {
+  background: #fff;
+}
+
+/* ---- controls ---- */
+
+
+.left-sidebar {
+  position:   fixed;
+  top:        0;
+  left:       0;
+  height:     100%;
+  background: #fff;
+  z-index:    2000;
+}
+
+.sidebar-label {
+  font-size: 0.8em;
+  color: #aaa;
+}
+
+.active .sidebar-label { color: inherit; }
+
+/* ---- sidebar animation ---- */
+
+.sidebar { width: 200px; }
+
+.sidebar-enter {
+  left: -200px;
+}
+
+.sidebar-enter-active {
+  left: 0;
+  transition: left 100ms ease-in;
+}
+
+.sidebar-leave {
+  left: 0;
+}
+
+.sidebar-leave-active {
+  left: -200px;
+  transition: left 100ms linear;
+}
+
+/* ---- lists ---- */
+
+.list-group, .list-group-item {
+  border-radius: 0;
+  border:  0;
+}
+
+.list-group-item:first-child {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+.list-group-item:last-child {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.list-group-item.active {
+  background-color: #eeeeee;
+  color: #2196f3;
+}
+
+.list-group-item:hover, .list-group-item.active:hover {
+  color: inherit;
+  background-color: #eeeeee;
+}
+
+.list-group-item.active:hover {
+  color: #2196f3;
+}
+
+/* ---- sidebar ---- */
+
+.sidebar-icon {
+  font-size: 24px;
+  width: 1em;
+  text-align: center;
+}
+
+.collapsed .list-group-item.active,
+.collapsed .list-group-item:hover,
+.collapsed .list-group-item.active:hover {
+  background-color: inherit;
+}
+
+/* toolbar */
+
+.fullscreen {
+  background: #000;
+}
+
+.fullscreen-toolbar {
+  color: #fff;
+  box-shadow: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+}
+
+.fullscreen-sidebar {
+  background: #fff;
+}
+
+.fullscreen-button {
+  z-index: 2;
+  color: #aaa;
+  font-weight: bold;
+  top: 0;
+  bottom: 0;
+}
+
+.fullscreen-button .rc-md-circle-icon-button{
+    color: #000;
+    background: #aaa;
+}
+
+
+/* -------- gallery images -------- */
+
+.gallery-image {
+  position: relative;
+  background: #eeeeee;
+  padding: 0;
+  transition: padding 75ms ease-in;
+}
+
+.gallery-image.active {
+  transition: padding 75ms ease-in;
+}
+
+.photo-selection-icon {
+  position:   absolute;
+  top:        0.25em;
+  left:       0.25em;
+  opacity:    0;
+  background: none;
+  color:      rgba(211,211,211,0.85);
+}
+
+.photo-selection-icon:hover {
+  color: #fff;
+}
+
+.photo-selection-icon.active,
+.active .gallery-selection-icon {
+  opacity: 1;
+  color: #2196f3;
+}
+
+.gallery-image:hover .photo-selection-icon {
+  opacity: 1;
+}
+
+.gallery-title {
+  position: relative;
+  left: 0;
+  transition: left 100ms ease-in .2s;
+}
+
+.gallery-header {
+  position: relative;
+}
+
+.gallery-header:hover .gallery-title,
+.gallery-header.active .gallery-title {
+  left: 2em;
+  transition: left 100ms ease-in .1s;
+}
+
+.gallery-selection-icon {
+  position: absolute;
+  font-size: 24px;
+  opacity: 0;
+  transition: opacity 100ms ease-in .1s;
+}
+
+.gallery-header:hover .gallery-selection-icon,
+.gallery-header.active .gallery-selection-icon {
+  opacity: 1;
+  transition: opacity 100ms ease-in .2s;
+}
+
+.selection-menu {
+  color:      #fff;
+  background: #2196f3;
+}
+.selection-menu .rc-title {
+  color: #fff;
+}

@@ -1,0 +1,2 @@
+;; Analyzed by ClojureScript 1.8.40
+{:name cljs-time.extend, :doc "### Optional namespace to extend goog.date.* DateTime types\n\n  Equality of goog.date.* DateTime types works differently to\n  clj-time/Joda's equality. Optionally require this namespace\n  to extend cljs.core/IEquiv protocol for:\n\n   * goog.date.Date\n   * goog.date.DateTime\n   * goog.date.UtcDateTime", :excludes #{}, :use-macros nil, :require-macros nil, :uses nil, :requires {goog.date.Date goog.date.Date, goog.date.DateTime goog.date.DateTime, goog.date.UtcDateTime goog.date.UtcDateTime}, :imports nil}
