@@ -96,7 +96,7 @@ goog.addDependency("../datascript/impl/entity.js", ['datascript.impl.entity'], [
 goog.addDependency("../ui/views/common/structure.js", ['ui.views.common.structure'], ['re_com.core', 'reagent.core', 'cljs.core', 'ui.views.common.animations']);
 goog.addDependency("../ui/views/common/images.js", ['ui.views.common.images'], ['re_com.core', 'cljs.core', 're_frame.core']);
 goog.addDependency("../ui/views/common/toolbar.js", ['ui.views.common.toolbar'], ['re_com.util', 're_com.core', 'cljs.core']);
-goog.addDependency("../ui/views/common/drawer.js", ['ui.views.common.drawer'], ['re_com.core', 'reagent.core', 'cljs.core', 'cljs.core.async']);
+goog.addDependency("../ui/views/common/drawer.js", ['ui.views.common.drawer'], ['reagent.core', 'cljs.core', 'cljs.core.async']);
 goog.addDependency("../ui/cards.js", ['ui.cards'], ['ui.views.common.structure', 'ui.views.common.data', 're_com.core', 'reagent.ratom', 'cljs_time.extend', 'reagent.core', 'cljs.core', 'ui.views.common.images', 'ui.views.common.toolbar', 'cljs_time.core', 'ui.views.common.drawer']);
 goog.addDependency("../datascript/pull_api.js", ['datascript.pull_api'], ['cljs.core', 'datascript.db', 'datascript.pull_parser']);
 goog.addDependency("../devcards/util/utils.js", ['devcards.util.utils'], ['cljs.core', 'cljs.pprint']);
