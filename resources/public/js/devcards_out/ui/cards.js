@@ -21,14 +21,14 @@ return new cljs.core.PersistentVector(null, 11, 5, cljs.core.PersistentVector.EM
 });
 ui.cards.frames = new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [(100),(250),(500)], null);
 ui.cards.framed_gallery = (function ui$cards$framed_gallery(images){
-return new cljs.core.PersistentVector(null, 5, 5, cljs.core.PersistentVector.EMPTY_NODE, [re_com.core.v_box,new cljs.core.Keyword(null,"gap","gap",80255254),"16px",new cljs.core.Keyword(null,"children","children",-940561982),cljs.core.map.call(null,(function (p__46776){
-var vec__46777 = p__46776;
-var path = cljs.core.nth.call(null,vec__46777,(0),null);
-var aspect = cljs.core.nth.call(null,vec__46777,(1),null);
-return new cljs.core.PersistentVector(null, 7, 5, cljs.core.PersistentVector.EMPTY_NODE, [re_com.core.h_box,new cljs.core.Keyword(null,"gap","gap",80255254),"16px",new cljs.core.Keyword(null,"align","align",1964212802),new cljs.core.Keyword(null,"center","center",-748944368),new cljs.core.Keyword(null,"children","children",-940561982),cljs.core.map.call(null,((function (vec__46777,path,aspect){
-return (function (p1__46773_SHARP_){
-return cljs.core.conj.call(null,new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [ui.cards.framed_image,path,aspect], null),p1__46773_SHARP_);
-});})(vec__46777,path,aspect))
+return new cljs.core.PersistentVector(null, 5, 5, cljs.core.PersistentVector.EMPTY_NODE, [re_com.core.v_box,new cljs.core.Keyword(null,"gap","gap",80255254),"16px",new cljs.core.Keyword(null,"children","children",-940561982),cljs.core.map.call(null,(function (p__48874){
+var vec__48875 = p__48874;
+var path = cljs.core.nth.call(null,vec__48875,(0),null);
+var aspect = cljs.core.nth.call(null,vec__48875,(1),null);
+return new cljs.core.PersistentVector(null, 7, 5, cljs.core.PersistentVector.EMPTY_NODE, [re_com.core.h_box,new cljs.core.Keyword(null,"gap","gap",80255254),"16px",new cljs.core.Keyword(null,"align","align",1964212802),new cljs.core.Keyword(null,"center","center",-748944368),new cljs.core.Keyword(null,"children","children",-940561982),cljs.core.map.call(null,((function (vec__48875,path,aspect){
+return (function (p1__48871_SHARP_){
+return cljs.core.conj.call(null,new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [ui.cards.framed_image,path,aspect], null),p1__48871_SHARP_);
+});})(vec__48875,path,aspect))
 ,ui.cards.frames)], null);
 }),images)], null);
 });
@@ -70,15 +70,15 @@ return cljs.core.swap_BANG_.call(null,ui.cards.slideshow_QMARK_,cljs.core.not);
 ui.cards.toggle_info_BANG_ = (function ui$cards$toggle_info_BANG_(){
 return cljs.core.swap_BANG_.call(null,ui.cards.info_QMARK_,cljs.core.not);
 });
-ui.cards.navigate_BANG_ = (function ui$cards$navigate_BANG_(p__46778){
-var map__46781 = p__46778;
-var map__46781__$1 = ((((!((map__46781 == null)))?((((map__46781.cljs$lang$protocol_mask$partition0$ & (64))) || (map__46781.cljs$core$ISeq$))?true:false):false))?cljs.core.apply.call(null,cljs.core.hash_map,map__46781):map__46781);
-var id = cljs.core.get.call(null,map__46781__$1,new cljs.core.Keyword(null,"id","id",-1388402092));
+ui.cards.navigate_BANG_ = (function ui$cards$navigate_BANG_(p__48876){
+var map__48879 = p__48876;
+var map__48879__$1 = ((((!((map__48879 == null)))?((((map__48879.cljs$lang$protocol_mask$partition0$ & (64))) || (map__48879.cljs$core$ISeq$))?true:false):false))?cljs.core.apply.call(null,cljs.core.hash_map,map__48879):map__48879);
+var id = cljs.core.get.call(null,map__48879__$1,new cljs.core.Keyword(null,"id","id",-1388402092));
 return cljs.core.reset_BANG_.call(null,ui.cards.page_model,id);
 });
 ui.cards.app_bar = (function ui$cards$app_bar(){
-return new cljs.core.PersistentVector(null, 13, 5, cljs.core.PersistentVector.EMPTY_NODE, [ui.views.common.toolbar.toolbar,new cljs.core.Keyword(null,"nav-icon","nav-icon",-1454298860),"zmdi-menu",new cljs.core.Keyword(null,"nav-tooltip","nav-tooltip",1212937734),"Main menu",new cljs.core.Keyword(null,"title","title",636505583),"Hello, World",new cljs.core.Keyword(null,"actions","actions",-812656882),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.PersistentArrayMap(null, 3, [new cljs.core.Keyword(null,"id","id",-1388402092),new cljs.core.Keyword(null,"slideshow","slideshow",286250871),new cljs.core.Keyword(null,"label","label",1718410804),"slideshow",new cljs.core.Keyword(null,"icon","icon",1679606541),"zmdi-slideshow"], null)], null),new cljs.core.Keyword(null,"on-nav","on-nav",1358020715),ui.cards.toggle_menu_BANG_,new cljs.core.Keyword(null,"on-action","on-action",-894612848),(function (p1__46783_SHARP_){
-if(cljs.core._EQ_.call(null,new cljs.core.Keyword(null,"id","id",-1388402092).cljs$core$IFn$_invoke$arity$1(p1__46783_SHARP_),new cljs.core.Keyword(null,"slideshow","slideshow",286250871))){
+return new cljs.core.PersistentVector(null, 13, 5, cljs.core.PersistentVector.EMPTY_NODE, [ui.views.common.toolbar.toolbar,new cljs.core.Keyword(null,"nav-icon","nav-icon",-1454298860),"zmdi-menu",new cljs.core.Keyword(null,"nav-tooltip","nav-tooltip",1212937734),"Main menu",new cljs.core.Keyword(null,"title","title",636505583),"Hello, World",new cljs.core.Keyword(null,"actions","actions",-812656882),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.PersistentArrayMap(null, 3, [new cljs.core.Keyword(null,"id","id",-1388402092),new cljs.core.Keyword(null,"slideshow","slideshow",286250871),new cljs.core.Keyword(null,"label","label",1718410804),"slideshow",new cljs.core.Keyword(null,"icon","icon",1679606541),"zmdi-slideshow"], null)], null),new cljs.core.Keyword(null,"on-nav","on-nav",1358020715),ui.cards.toggle_menu_BANG_,new cljs.core.Keyword(null,"on-action","on-action",-894612848),(function (p1__48881_SHARP_){
+if(cljs.core._EQ_.call(null,new cljs.core.Keyword(null,"id","id",-1388402092).cljs$core$IFn$_invoke$arity$1(p1__48881_SHARP_),new cljs.core.Keyword(null,"slideshow","slideshow",286250871))){
 return ui.cards.toggle_slideshow_BANG_.call(null);
 } else {
 return null;
@@ -106,19 +106,19 @@ return devcards.core.card_base.call(null,new cljs.core.PersistentArrayMap(null, 
 ui.cards.date_time__GT_model = (function ui$cards$date_time__GT_model(date_time){
 return new cljs.core.PersistentArrayMap(null, 5, [new cljs.core.Keyword(null,"year","year",335913393),date_time.getFullYear(),new cljs.core.Keyword(null,"month","month",-1960248533),(date_time.getMonth() + (1)),new cljs.core.Keyword(null,"day","day",-274800446),date_time.getDate(),new cljs.core.Keyword(null,"hour","hour",-555989214),date_time.getHours(),new cljs.core.Keyword(null,"minute","minute",-642875969),date_time.getMinutes()], null);
 });
-ui.cards.model__GT_date_time = (function ui$cards$model__GT_date_time(p__46784){
-var map__46787 = p__46784;
-var map__46787__$1 = ((((!((map__46787 == null)))?((((map__46787.cljs$lang$protocol_mask$partition0$ & (64))) || (map__46787.cljs$core$ISeq$))?true:false):false))?cljs.core.apply.call(null,cljs.core.hash_map,map__46787):map__46787);
-var year = cljs.core.get.call(null,map__46787__$1,new cljs.core.Keyword(null,"year","year",335913393));
-var month = cljs.core.get.call(null,map__46787__$1,new cljs.core.Keyword(null,"month","month",-1960248533));
-var day = cljs.core.get.call(null,map__46787__$1,new cljs.core.Keyword(null,"day","day",-274800446));
-var hour = cljs.core.get.call(null,map__46787__$1,new cljs.core.Keyword(null,"hour","hour",-555989214));
-var minute = cljs.core.get.call(null,map__46787__$1,new cljs.core.Keyword(null,"minute","minute",-642875969));
+ui.cards.model__GT_date_time = (function ui$cards$model__GT_date_time(p__48882){
+var map__48885 = p__48882;
+var map__48885__$1 = ((((!((map__48885 == null)))?((((map__48885.cljs$lang$protocol_mask$partition0$ & (64))) || (map__48885.cljs$core$ISeq$))?true:false):false))?cljs.core.apply.call(null,cljs.core.hash_map,map__48885):map__48885);
+var year = cljs.core.get.call(null,map__48885__$1,new cljs.core.Keyword(null,"year","year",335913393));
+var month = cljs.core.get.call(null,map__48885__$1,new cljs.core.Keyword(null,"month","month",-1960248533));
+var day = cljs.core.get.call(null,map__48885__$1,new cljs.core.Keyword(null,"day","day",-274800446));
+var hour = cljs.core.get.call(null,map__48885__$1,new cljs.core.Keyword(null,"hour","hour",-555989214));
+var minute = cljs.core.get.call(null,map__48885__$1,new cljs.core.Keyword(null,"minute","minute",-642875969));
 return (new goog.date.DateTime(year,(month - (1)),day,hour,minute));
 });
 ui.cards.my_date = reagent.core.atom.call(null,(new goog.date.DateTime()));
-ui.cards.set_date_BANG_ = (function ui$cards$set_date_BANG_(p1__46789_SHARP_){
-return cljs.core.reset_BANG_.call(null,ui.cards.my_date,ui.cards.model__GT_date_time.call(null,p1__46789_SHARP_));
+ui.cards.set_date_BANG_ = (function ui$cards$set_date_BANG_(p1__48887_SHARP_){
+return cljs.core.reset_BANG_.call(null,ui.cards.my_date,ui.cards.model__GT_date_time.call(null,p1__48887_SHARP_));
 });
 ui.cards.date = (function ui$cards$date(){
 return new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [re_com.core.box,new cljs.core.Keyword(null,"child","child",623967545),new cljs.core.PersistentVector(null, 7, 5, cljs.core.PersistentVector.EMPTY_NODE, [ui.views.common.data.date_field,new cljs.core.Keyword(null,"class","class",-2030961996),"white",new cljs.core.Keyword(null,"model","model",331153215),reagent.ratom.make_reaction.call(null,(function (){
@@ -131,8 +131,8 @@ devcards.core.register_card.call(null,new cljs.core.PersistentArrayMap(null, 2, 
 return devcards.core.card_base.call(null,new cljs.core.PersistentArrayMap(null, 5, [new cljs.core.Keyword(null,"name","name",1843675177),"date-form",new cljs.core.Keyword(null,"documentation","documentation",1889593999),null,new cljs.core.Keyword(null,"main-obj","main-obj",-1544409742),reagent.core.as_element.call(null,new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [ui.cards.date], null)),new cljs.core.Keyword(null,"initial-data","initial-data",-1315709804),cljs.core.PersistentArrayMap.EMPTY,new cljs.core.Keyword(null,"options","options",99638489),cljs.core.PersistentArrayMap.EMPTY], null));
 })], null));
 ui.cards.slideshow_bar = (function ui$cards$slideshow_bar(){
-return new cljs.core.PersistentVector(null, 13, 5, cljs.core.PersistentVector.EMPTY_NODE, [ui.views.common.toolbar.toolbar,new cljs.core.Keyword(null,"class","class",-2030961996),"translucent",new cljs.core.Keyword(null,"nav-icon","nav-icon",-1454298860),"zmdi-close",new cljs.core.Keyword(null,"nav-tooltip","nav-tooltip",1212937734),"Photos",new cljs.core.Keyword(null,"actions","actions",-812656882),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.PersistentArrayMap(null, 3, [new cljs.core.Keyword(null,"id","id",-1388402092),new cljs.core.Keyword(null,"info","info",-317069002),new cljs.core.Keyword(null,"label","label",1718410804),"Info",new cljs.core.Keyword(null,"icon","icon",1679606541),"zmdi-info"], null)], null),new cljs.core.Keyword(null,"on-nav","on-nav",1358020715),ui.cards.toggle_slideshow_BANG_,new cljs.core.Keyword(null,"on-action","on-action",-894612848),(function (p1__46790_SHARP_){
-if(cljs.core._EQ_.call(null,new cljs.core.Keyword(null,"id","id",-1388402092).cljs$core$IFn$_invoke$arity$1(p1__46790_SHARP_),new cljs.core.Keyword(null,"info","info",-317069002))){
+return new cljs.core.PersistentVector(null, 13, 5, cljs.core.PersistentVector.EMPTY_NODE, [ui.views.common.toolbar.toolbar,new cljs.core.Keyword(null,"class","class",-2030961996),"translucent",new cljs.core.Keyword(null,"nav-icon","nav-icon",-1454298860),"zmdi-close",new cljs.core.Keyword(null,"nav-tooltip","nav-tooltip",1212937734),"Photos",new cljs.core.Keyword(null,"actions","actions",-812656882),new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.PersistentArrayMap(null, 3, [new cljs.core.Keyword(null,"id","id",-1388402092),new cljs.core.Keyword(null,"info","info",-317069002),new cljs.core.Keyword(null,"label","label",1718410804),"Info",new cljs.core.Keyword(null,"icon","icon",1679606541),"zmdi-info"], null)], null),new cljs.core.Keyword(null,"on-nav","on-nav",1358020715),ui.cards.toggle_slideshow_BANG_,new cljs.core.Keyword(null,"on-action","on-action",-894612848),(function (p1__48888_SHARP_){
+if(cljs.core._EQ_.call(null,new cljs.core.Keyword(null,"id","id",-1388402092).cljs$core$IFn$_invoke$arity$1(p1__48888_SHARP_),new cljs.core.Keyword(null,"info","info",-317069002))){
 return ui.cards.toggle_info_BANG_.call(null);
 } else {
 return null;
@@ -155,4 +155,4 @@ devcards.core.register_card.call(null,new cljs.core.PersistentArrayMap(null, 2, 
 return devcards.core.card_base.call(null,new cljs.core.PersistentArrayMap(null, 5, [new cljs.core.Keyword(null,"name","name",1843675177),"drawer",new cljs.core.Keyword(null,"documentation","documentation",1889593999),null,new cljs.core.Keyword(null,"main-obj","main-obj",-1544409742),reagent.core.as_element.call(null,new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [new cljs.core.Keyword(null,"div.drawer-test","div.drawer-test",1808961637),new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null,"style","style",-496642736),new cljs.core.PersistentArrayMap(null, 3, [new cljs.core.Keyword(null,"position","position",-2011731912),"relative",new cljs.core.Keyword(null,"width","width",-384071477),"100%",new cljs.core.Keyword(null,"height","height",1025178622),"700px"], null)], null),new cljs.core.PersistentVector(null, 3, 5, cljs.core.PersistentVector.EMPTY_NODE, [ui.views.common.drawer.drawer,new cljs.core.Keyword(null,"children","children",-940561982),new cljs.core.PersistentVector(null, 5, 5, cljs.core.PersistentVector.EMPTY_NODE, [cljs.core.with_meta(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [ui.cards.date], null),new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null,"key","key",-1516042587),"k1"], null)),cljs.core.with_meta(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [ui.cards.date], null),new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null,"key","key",-1516042587),"k2"], null)),cljs.core.with_meta(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [ui.cards.date], null),new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null,"key","key",-1516042587),"k3"], null)),cljs.core.with_meta(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [ui.cards.date], null),new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null,"key","key",-1516042587),"k4"], null)),cljs.core.with_meta(new cljs.core.PersistentVector(null, 1, 5, cljs.core.PersistentVector.EMPTY_NODE, [ui.cards.date], null),new cljs.core.PersistentArrayMap(null, 1, [new cljs.core.Keyword(null,"key","key",-1516042587),"k5"], null))], null)], null)], null)),new cljs.core.Keyword(null,"initial-data","initial-data",-1315709804),cljs.core.PersistentArrayMap.EMPTY,new cljs.core.Keyword(null,"options","options",99638489),cljs.core.PersistentArrayMap.EMPTY], null));
 })], null));
 
-//# sourceMappingURL=cards.js.map?rel=1478933243021
+//# sourceMappingURL=cards.js.map?rel=1478935731791

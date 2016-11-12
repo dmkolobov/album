@@ -68,8 +68,8 @@
   [pw w offsets]
   (map-indexed (fn [idx offset]
        {:final    (translate-3d 0 offset)
-        :duration 250
-        :delay    (if (> w pw) 100 0)})
+        :duration 1000
+        :delay    (if (> w pw) 400 0)})
      offsets))
 
 (defn drawer
@@ -96,21 +96,21 @@
                                                           max-width
                                                           offsets)]
 
-             (reagent/next-tick ;;
+             (reagent/next-tick 
 
                (fn []
 
                  (when (not= max-width prev-width)
                    (doto (js/move parent-key)
                      (.set "transform" (translate-3d (- max-width) 0))
-                     (.duration 250)
-                     (.delay (if (> max-width prev-width) 0 100))
-                     (.ease "snap")
+                     (.duration 1000)
+                     (.delay (if (> max-width prev-width) 0 400))
+                     (.ease "cubic-bezier(0.4, 0.0, 0.2, 1)")
                      (.end)))
 
                  (doall
                    (map (fn [item-key item-node cb {:keys [initial final duration delay ease]
-                                                    :or   {ease "snap"}}]
+                                                    :or   {ease "cubic-bezier(0.4, 0.0, 0.2, 1)"}}]
                           (when initial
                             (aset item-node "style" "transform" initial)
                             (aget item-node "offsetLeft"))

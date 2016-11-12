@@ -54,7 +54,7 @@
                "style"
                "position"
                "absolute")
-         (js/setTimeout cb 460)))
+         (js/setTimeout cb 1000)))
      :reagent-render
      (fn [c] c)}))
 
