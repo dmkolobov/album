@@ -2,7 +2,7 @@
   (:require-macros [cljs.core.async.macros :refer [go go-loop]])
   (:require [re-com.core :refer [box]]
             [reagent.core :as reagent]
-            [cljs.core.async :refer [put! <! chan]]))
+            [cljs.core.async :as async :refer [put! <! chan]]))
 
 (def transition
   (reagent/adapt-react-class js/React.addons.TransitionGroup))
@@ -21,6 +21,7 @@
                                      node (reagent/dom-node owner)]
                                  (js/ResizeSensor. node
                                                    (fn []
+                                                     (println "resized" key (.now js/Date))
                                                      (resize)))))
 
      :reagent-render       (fn [_ child] [box :class "drawer-child"
@@ -90,13 +91,22 @@
   (aset node "style" "transform" final)
   (when callback (callback)))
 
+(defn throttle-chan
+  [c ms]
+  (let [c' (chan)]
+    (go-loop []
+        (put! c' (<! c))
+        (<! (async/timeout ms))
+        (recur))
+    c'))
+
 (defn drawer
   [& _]
   (let [state        (atom {:parent-node nil
                             :prev-width 0
                             :nodes       {}
                             :callbacks   {}})
-        animate-chan (chan)
+        animate-chan (chan (async/dropping-buffer 1))
         child-fn     (drawer-child (partial register-child state)
                                    (partial put! animate-chan resize-sequence))]
 
@@ -109,14 +119,17 @@
                  [_ & {:keys [children]}] (reagent/argv this)
                  child-keys               (map (comp :key meta) children)
                  [max-width offsets]      (layout child-keys nodes)]
+             (reagent/next-tick
+               (fn []
+                 (animate! parent-node nil {:final    (translate-3d (- max-width) 0)
+                                            :duration 150
+                                            :delay    (if (> max-width prev-width) 0 100)})
+                 (doall
+                   (map animate!
+                        (map #(get nodes %)     child-keys)
+                        (map #(get callbacks %) child-keys)
+                        (choreography prev-width max-width offsets)))))
              (swap! state assoc :prev-width max-width)
-             (doall (map animate!
-                         (map #(get nodes %) child-keys)
-                         (map #(get callbacks %) child-keys)
-                         (choreography prev-width max-width offsets)))
-             (animate! parent-node nil {:final    (translate-3d (- max-width) 0)
-                                        :duration 150
-                                        :delay    (if (> max-width prev-width) 0 150)})
              (recur))))
 
 
